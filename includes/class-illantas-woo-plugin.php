@@ -74,7 +74,7 @@ class Illantas_Woo {
 		$this->load_dependencies();
 		$this->set_locale();
 		$this->define_admin_hooks();
-		$this->define_public_hooks();
+		//$this->define_public_hooks();
 
 	} // __construct()
 
@@ -164,10 +164,6 @@ class Illantas_Woo {
 		$this->loader->add_action( 'edited_'.TAX_MODELO, $plugin_admin, 'save_marcas_fields', 10, 2);
 		$this->loader->add_action( 'created_'.TAX_MODELO, $plugin_admin, 'save_marcas_fields', 10, 2);
 
-
-
-		// add_action( 'pa_modelo_add_form_fields', 'add_marcas_field', 10, 2 );
-
 	} // define_admin_hooks()
 
 	/**
@@ -177,14 +173,14 @@ class Illantas_Woo {
 	 * @since 		1.0.0
 	 * @access 		private
 	 */
-	private function define_public_hooks() {
+	// private function define_public_hooks() {
 
-		$plugin_public = new Illantas_Woo_Public( $this->get_plugin_name(), $this->get_version() );
+	// 	$plugin_public = new Illantas_Woo_Public( $this->get_plugin_name(), $this->get_version() );
 
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+	// 	$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
+	// 	$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 
-	} // define_public_hooks()
+	// } // define_public_hooks()
 
 	/**
 	 * Run the loader to execute all of the hooks with WordPress.

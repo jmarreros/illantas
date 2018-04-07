@@ -77,8 +77,8 @@ class Illantas_Woo_Admin {
 	public function illantas_admin_menu() {
 		
 		add_submenu_page( 'woocommerce',
-						'Marca/Modelo',
-						'Marca/Modelo',
+						'iLlantas',
+						'iLlantas',
 						'manage_options', 
 						'illantas',
 						array( $this, 'illantas_admin_relations') );
@@ -88,17 +88,19 @@ class Illantas_Woo_Admin {
 
 	// Muestra la opción de menú
 	public function illantas_admin_relations(){
-		include_once ILLANTAS_DIR . 'admin/partials/illantas-woo-admin-display.php';
+		//include_once ILLANTAS_DIR . 'admin/partials/illantas-woo-admin-display.php';
+		echo "Settings";
 	}
 
 
 	// Agregar campo adicional a la taxonomia pa_modelos
 	public function add_marcas_field( $taxonomy ) {
+		include_once ILLANTAS_DIR . 'includes/class-illantas-woo-relations.php';		
 		include_once ILLANTAS_DIR . 'admin/partials/illantas-woo-field-term-display.php';		
 	}
 
 
-
+	// Graba las marcas del campo añadido
 	public function save_marcas_fields( $term_id ) {  
 	    if ( isset( $_POST['sel-marcas'] ) ) {
 
@@ -109,25 +111,24 @@ class Illantas_Woo_Admin {
 	}  
 
 
-
 	// Después de grabar un producto
 	public function illantas_save_product( $post_id, $post, $update ) {
-	    $product = wc_get_product( $post_id );
+	 //    $product = wc_get_product( $post_id );
 	    
-	    $attr = $product->get_attributes();
+	 //    $attr = $product->get_attributes();
 
-		$brands = wp_get_post_terms( $post_id, 'product_brand', ['fields' => 'all']);
+		// $brands = wp_get_post_terms( $post_id, 'product_brand', ['fields' => 'all']);
 
-		$marcas = wp_get_post_terms( $post_id, 'pa_marca' );
+		// $marcas = wp_get_post_terms( $post_id, 'pa_marca' );
 		
-		error_log( print_r( $brands, true ) );
-		error_log( print_r( $marcas, true ) );
+		// error_log( print_r( $brands, true ) );
+		// error_log( print_r( $marcas, true ) );
 
-	    // foreach ($attr as $key => $value) {
-	    // 	error_log( print_r( $value, true ) );
-	    // }
+	 //    // foreach ($attr as $key => $value) {
+	 //    // 	error_log( print_r( $value, true ) );
+	 //    // }
 
-	    // error_log($update);
+	 //    // error_log($update);
 
 	}
 

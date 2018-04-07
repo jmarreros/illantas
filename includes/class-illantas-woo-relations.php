@@ -13,18 +13,6 @@
 class Illantas_Woo_Relations {
 
 
-	// public function get_modelos_marca( $id_marca ){
-	// 	global $wpdb;
-
-	// 	$table_rel = $wpdb->prefix . ILLANTAS_TABLE;
-	// 	$table_terms = $wpdb->prefix . "terms";
-
-	// 	$query = "SELECT ir.id_term, t.name, ir.modelo FROM $table_rel  ir
-	// 			INNER JOIN $table_terms t ON t.term_id = ir.id_term WHERE ir.id_term = $id_marca";
-
-	// 	return $wpdb->get_results( $query );
-	// }
-
 	public function get_marcas(){
 		$terms_marca = get_terms( [ 'taxonomy' => TAX_MARCA, 'hide_empty' => false ]);
 		return $terms_marca;
@@ -36,6 +24,17 @@ class Illantas_Woo_Relations {
 	}
 
 
+	// public function get_modelos_marca( $id_marca ){
+	// 	global $wpdb;
+
+	// 	$table_rel = $wpdb->prefix . ILLANTAS_TABLE;
+	// 	$table_terms = $wpdb->prefix . "terms";
+
+	// 	$query = "SELECT ir.id_term, t.name, ir.modelo FROM $table_rel  ir
+	// 			INNER JOIN $table_terms t ON t.term_id = ir.id_term WHERE ir.id_term = $id_marca";
+
+	// 	return $wpdb->get_results( $query );
+	// }
 	// Mantenimiento de la tabla wp_illantas_relations
 	// ==============================================
 

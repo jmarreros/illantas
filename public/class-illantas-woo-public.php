@@ -60,9 +60,7 @@ class Illantas_Woo_Public {
 	 * @since 		1.0.0
 	 */
 	public function enqueue_styles() {
-
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/illantas-woo-public.css', array(), $this->version, 'all' );
-
 	} // enqueue_styles()
 
 	/**
@@ -71,9 +69,9 @@ class Illantas_Woo_Public {
 	 * @since 		1.0.0
 	 */
 	public function enqueue_scripts() {
-
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/illantas-woo-public.js', array( 'jquery' ), $this->version, false );
-
 	} // enqueue_scripts()
+
+
 
 } // class
