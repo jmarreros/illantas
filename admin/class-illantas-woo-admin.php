@@ -76,28 +76,65 @@ class Illantas_Woo_Admin {
 
 	public function illantas_save_attributes(){
 
-		
 		if ( isset ( $_POST['post_id'] ) ){
 
     		$product_id = absint($_POST['post_id']);
 			parse_str($_POST['data'], $data);
-			$attributes = $data['attribute_names'];
 
-			if ( in_array( TAX_MARCA , $attributes ) ){
+			$product_meta = get_post_meta( $product_id, POST_META_MARCA, true ); // recupero los valores guardados anteriormente
+			$attrs_names = $data['attribute_names']; // para comprobar si tiene atributo marca
+			$attrs_values = array(); // para recuperar los valores de marcas que tiene
 
-				$indexes = array_keys( $attributes , TAX_MARCA ); //consistencia en caso elimine el atributo y luego lo agregue
-				$index = end($indexes);
+			if ( in_array( TAX_MARCA , $attrs_names ) ){
 
+				//consistencia en caso elimine el atributo y luego lo agregue, siempre recupera el último
+				$keys_marcas = array_keys( $attrs_names , TAX_MARCA ); 
+				$index = end( $keys_marcas ); 
+				
+				//verificar si existen valores de marcas
+				if ( array_key_exists( $index, $data['attribute_values'] ) ) {
+					$attrs_values = $data['attribute_values'][$index]; // recupero todos los valores de marcas
+				}
 
 			}
 
+			// Agrego o elimino modelos de acuerdo a la comparación de arrays de marcas
+			$this->add_remove_attributes( $product_id, $product_meta, $attrs_values );
+
+			// actualizo los valores de las marcas actuales
+			update_post_meta( $product_id, POST_META_MARCA, $attrs_values ); 
 
 		}
-
 
 	}
 
 
+	private function add_remove_attributes( $product_id, $arr_before, $arr_after){
+		
+		if ( ! $product_id ) return;
+
+		foreach ( $arr_before as $item ){
+			if ( ! in_array( $item, $arr_after ) ){
+				// eliminamos modelos
+				error_log("Eliminar modelos de la marca $item");
+			}
+		}
+		foreach ( $arr_after as $item ){
+			if ( ! in_array( $item, $arr_before ) ){
+				// agregamos modelos
+				error_log("Agregar modelo de la marca $item");
+
+				// wp_set_object_terms( $product_id, );
+			}			
+		}
+	}
+
+	private function get_modelos_marca( $id_marca ){
+		
+	}
+
+
+	// error_log( print_r( $data['attribute_values'][$index], true) );
 
 	// Después de grabar un producto
 	// public function illantas_save_product( $post_id, $post, $update ) {
