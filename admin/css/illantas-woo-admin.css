@@ -3,7 +3,7 @@
  * included in this file.
  */
 
-#frm_marcas >div{
+/*#frm_marcas >div{
 	padding: 10px;
 }
 
@@ -23,7 +23,7 @@
 
 #tbl-modelos{
 	max-width: 480px;
-}
+}*/
 
 /*body.edit-tags-php #acf-marcas{
   display:none;

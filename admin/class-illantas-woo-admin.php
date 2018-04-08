@@ -54,44 +54,6 @@ class Illantas_Woo_Admin {
 
 	} // __ construct()
 
-	/**
-	 * Register the stylesheets for the admin area.
-	 *
-	 * @since 		1.0.0
-	 */
-	public function enqueue_styles() {
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/illantas-woo-admin.css', array(), $this->version, 'all' );
-	} // enqueue_styles()
-
-	/**
-	 * Register the JavaScript for the admin area.
-	 *
-	 * @since 		1.0.0
-	 */
-	public function enqueue_scripts() {
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/illantas-woo-admin.js', array( 'jquery' ), $this->version, false );
-	} // enqueue_scripts()
-
-
-	// Menú bajo Woocommerce
-	public function illantas_admin_menu() {
-		
-		add_submenu_page( 'woocommerce',
-						'iLlantas',
-						'iLlantas',
-						'manage_options', 
-						'illantas',
-						array( $this, 'illantas_admin_relations') );
-
-	}
-
-
-	// Muestra la opción de menú
-	public function illantas_admin_relations(){
-		//include_once ILLANTAS_DIR . 'admin/partials/illantas-woo-admin-display.php';
-		echo "Settings";
-	}
-
 
 	// Agregar campo adicional a la taxonomia pa_modelos
 	public function add_marcas_field( $taxonomy ) {
@@ -103,16 +65,71 @@ class Illantas_Woo_Admin {
 	// Graba las marcas del campo añadido
 	public function save_marcas_fields( $term_id ) {  
 	    if ( isset( $_POST['sel-marcas'] ) ) {
-
 	    	$id_marca = $_POST['sel-marcas'];
-
 	        update_term_meta( $term_id, TERM_META, $id_marca );
 	    }  
 	}  
 
 
+
+	// Save product attributes
+
+	public function illantas_save_attributes(){
+
+		
+		if ( isset ( $_POST['post_id'] ) ){
+
+    		$product_id = absint($_POST['post_id']);
+			parse_str($_POST['data'], $data);
+			$attributes = $data['attribute_names'];
+
+			if ( in_array( TAX_MARCA , $attributes ) ){
+
+				$indexes = array_keys( $attributes , TAX_MARCA ); //consistencia en caso elimine el atributo y luego lo agregue
+				$index = end($indexes);
+
+
+			}
+
+
+		}
+
+
+	}
+
+
+
 	// Después de grabar un producto
-	public function illantas_save_product( $post_id, $post, $update ) {
+	// public function illantas_save_product( $post_id, $post, $update ) {
+
+
+	// 	// 	$terms = wp_get_post_terms( $post_id, 'pa_marca' );
+
+	// 	// 	error_log( print_r( $terms, true ) );
+
+
+	// 	// // error_log( print_r($post, true) );
+
+	// 	// if ( $post_id ){ //edición
+
+	// 		// $product = wc_get_product( $post_id );
+	// 		// $attrs = $product->get_attributes();
+
+
+
+	// 		// error_log( print_r( $attrs, true ) );
+
+	// 		// if ( isset( $attrs['pa_marca'] ) ){
+	// 		// 	error_log( print_r( $attrs['pa_marca'], true ) );
+	// 		// }
+
+	// 		// $saved_marcas =  get_post_meta( $post_id, POST_META_MARCA, true );
+
+	// 		// foreach ( $saved_marcas as $marca ) {
+				
+	// 		// }
+
+	// 	}
 	 //    $product = wc_get_product( $post_id );
 	    
 	 //    $attr = $product->get_attributes();
@@ -130,7 +147,7 @@ class Illantas_Woo_Admin {
 
 	 //    // error_log($update);
 
-	}
+	// }
 
 
 
@@ -139,3 +156,38 @@ class Illantas_Woo_Admin {
 
 
 } // class
+
+
+
+
+	// public function enqueue_styles() {
+	// 	wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/illantas-woo-admin.css', array(), $this->version, 'all' );
+	// } // enqueue_styles()
+
+
+	// public function enqueue_scripts() {
+	// 	wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/illantas-woo-admin.js', array( 'jquery' ), $this->version, false );
+	// } // enqueue_scripts()
+
+
+
+	// Menú bajo Woocommerce
+	// public function illantas_admin_menu() {
+		
+	// 	add_submenu_page( 'woocommerce',
+	// 					'iLlantas',
+	// 					'iLlantas',
+	// 					'manage_options', 
+	// 					'illantas',
+	// 					array( $this, 'illantas_admin_relations') );
+
+	// }
+
+
+	// // Muestra la opción de menú
+	// public function illantas_admin_relations(){
+	// 	//include_once ILLANTAS_DIR . 'admin/partials/illantas-woo-admin-display.php';
+	// }
+
+
+

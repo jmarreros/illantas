@@ -1,15 +1,13 @@
 <?php
 
 $sel_marca = 0;
+$rel = new Illantas_Woo_Relations();
+$terms_marca = $rel->get_marcas();
 
 if ( isset ( $taxonomy->term_id ) ){ //Edición del term (pa_modelo)
 
 	$term_id = $taxonomy->term_id; // pa_modelo
 	$sel_marca = get_term_meta( $term_id , TERM_META , true); // term_meta sel-marca
-
-	$rel = new Illantas_Woo_Relations();
-	$terms_marca = $rel->get_marcas();
-
 	?>
 	<tr class="form-field">  
 	    <th scope="row">  
