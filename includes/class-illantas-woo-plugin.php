@@ -152,8 +152,11 @@ class Illantas_Woo {
 		$plugin_admin = new Illantas_Woo_Admin( $this->get_plugin_name(), $this->get_version() );
 
 		// graba cambios al grabar los atributos de un producto
-		$this->loader->add_action( 'wp_ajax_woocommerce_save_attributes', $plugin_admin, 'illantas_save_attributes', 0);
+		$this->loader->add_action( 'wp_ajax_woocommerce_save_attributes', $plugin_admin, 'illantas_save_attributes', 10);
+		$this->loader->add_action( 'updated_post_meta', $plugin_admin, 'illantas_update_post_meta', 10, 4);
 
+
+		$this->loader->add_action( 'admin_menu', $plugin_admin, 'illantas_admin_menu', 99 );
 
 		// agrega campo marca en taxonomia modelo
 		$this->loader->add_action( TAX_MODELO.'_edit_form_fields', $plugin_admin, 'add_marcas_field', 10, 2);
@@ -232,6 +235,7 @@ class Illantas_Woo {
 } // class
 
 
+// $this->loader->add_action( 'save_post_product', $plugin_admin, 'illantas_save_product', 1000, 3);
 
 // $this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 // $this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );

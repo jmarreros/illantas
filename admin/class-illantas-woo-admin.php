@@ -20,6 +20,10 @@
  * @subpackage 		Illantas_Woo/admin
  * @author 			jmarreros
  */
+
+include_once ILLANTAS_DIR . 'includes/class-illantas-woo-relations.php';		
+
+
 class Illantas_Woo_Admin {
 
 	/**
@@ -55,9 +59,53 @@ class Illantas_Woo_Admin {
 	} // __ construct()
 
 
+	// Menú bajo Woocommerce
+	public function illantas_admin_menu() {
+		
+		add_submenu_page( 'woocommerce',
+						'iLlantas',
+						'iLlantas',
+						'manage_options', 
+						'illantas',
+						array( $this, 'illantas_admin_relations') );
+
+	}
+
+
+	// Muestra la opción de menú
+	public function illantas_admin_relations(){
+		// include_once ILLANTAS_DIR . 'includes/class-illantas-woo-relations.php';		
+		// $rel = new Illantas_Woo_Relations();
+		// $arr = $rel->get_modelos_marca( 34 );
+
+		// print_r($arr);
+
+		// $product_id = 68;
+
+		// $modelos[] = 35;
+		// $modelos[] = 36;
+
+
+		// wp_set_object_terms( $product_id, $modelos, TAX_MODELO ); // agregamos modelos
+		// $meta_data_post = [
+		//      				TAX_MODELO => [ 'name'=> TAX_MODELO, 
+		//      								'value'=> $modelos,
+		//            						  	'is_visible' => '1', 
+		//            						  	'is_variation' => '0', 
+		//            						  	'is_taxonomy' => '1' ]
+		// 				  ];
+
+		// update_post_meta( $product_id, '_product_attributes', $meta_data_post );
+
+
+
+
+
+		echo "hola";
+	}
+
 	// Agregar campo adicional a la taxonomia pa_modelos
 	public function add_marcas_field( $taxonomy ) {
-		include_once ILLANTAS_DIR . 'includes/class-illantas-woo-relations.php';		
 		include_once ILLANTAS_DIR . 'admin/partials/illantas-woo-field-term-display.php';		
 	}
 
@@ -72,8 +120,51 @@ class Illantas_Woo_Admin {
 
 
 
-	// Save product attributes
+// Grabado al final de todo grabado del producto
+	public function illantas_update_post_meta( $meta_id, $post_id, $meta_key, $meta_value ){
 
+		if( $meta_key == '_edit_lock' ) {
+
+			$modelos_transient = get_transient( TRANSIENT_MARCAS_GRABAR . '|' . $post_id );
+
+			error_log( print_r( $modelos_transient, true ) );
+
+	        $product_id = 68;
+
+			$modelos[] = 35;
+			$modelos[] = 36;
+
+
+			$meta_tmp = get_post_meta($product_id, '_product_attributes', true);
+
+			$meta_data_post = Array();
+			
+
+			foreach ($meta_tmp as $item) {
+				$meta_data_post[ $item['name'] ] = $item;
+			}
+
+			wp_set_object_terms( $product_id, $modelos, TAX_MODELO ); // agregamos modelos
+			$meta_data_post[TAX_MODELO] = [ 'name'=> TAX_MODELO, 
+		     								'value'=> $modelos,
+		           						  	'is_visible' => '1',
+		           						  	'position' => '2',
+		           						  	'is_variation' => '0', 
+		           						  	'is_taxonomy' => '1' ];
+	
+
+			//$meta_data_post[] =  $meta_tmp;
+
+			error_log( print_r( "Entro metaaa", true ) );
+
+			update_post_meta( $product_id, '_product_attributes', $meta_data_post );
+
+    	}
+
+    }
+
+
+	// Save product attributes
 	public function illantas_save_attributes(){
 
 		if ( isset ( $_POST['post_id'] ) ){
@@ -92,14 +183,15 @@ class Illantas_Woo_Admin {
 				$index = end( $keys_marcas ); 
 				
 				//verificar si existen valores de marcas
-				if ( array_key_exists( $index, $data['attribute_values'] ) ) {
+				if ( isset( $data['attribute_values'] ) && array_key_exists( $index, $data['attribute_values'] ) ) {
 					$attrs_values = $data['attribute_values'][$index]; // recupero todos los valores de marcas
 				}
 
 			}
 
 			// Agrego o elimino modelos de acuerdo a la comparación de arrays de marcas
-			$this->add_remove_attributes( $product_id, $product_meta, $attrs_values );
+			$this->transient_add_attributes( $product_id, $product_meta, $attrs_values );
+
 
 			// actualizo los valores de las marcas actuales
 			update_post_meta( $product_id, POST_META_MARCA, $attrs_values ); 
@@ -108,31 +200,66 @@ class Illantas_Woo_Admin {
 
 	}
 
-
-	private function add_remove_attributes( $product_id, $arr_before, $arr_after){
+	// Almacenamiento temporal de los modelos de las marcas agregadas
+	private function transient_add_attributes( $product_id, $arr_before, $arr_after ){
 		
 		if ( ! $product_id ) return;
 
-		foreach ( $arr_before as $item ){
-			if ( ! in_array( $item, $arr_after ) ){
-				// eliminamos modelos
-				error_log("Eliminar modelos de la marca $item");
+		$rel = new Illantas_Woo_Relations();
+		$modelos = Array();
+
+		foreach ( $arr_after as $item ){ //Agregar modelos
+			if ( ! in_array( $item, $arr_before ) ){
+				$modelos = array_merge( $modelos, $rel->get_modelos_marca( $item ) ); // un array continuo de elementos modelos
 			}
 		}
-		foreach ( $arr_after as $item ){
-			if ( ! in_array( $item, $arr_before ) ){
-				// agregamos modelos
-				error_log("Agregar modelo de la marca $item");
 
-				// wp_set_object_terms( $product_id, );
-			}			
-		}
+		$transient_name = TRANSIENT_MARCAS_GRABAR . '|' . $product_id;
+		set_transient( $transient_name, $modelos, MINUTE_IN_SECONDS*5 );
+
 	}
 
-	private function get_modelos_marca( $id_marca ){
+
+} // class
+
+
+
+
+
+
+
+	// Después de grabar un producto
+	// public function illantas_save_product( $post_id, $post, $update ) {
 		
-	}
+	// 	$product_id = 68;
 
+	// 	$modelos[] = 35;
+	// 	$modelos[] = 36;
+
+
+	// 	wp_set_object_terms( $product_id, $modelos, TAX_MODELO ); // agregamos modelos
+	// 	$meta_data_post = [
+	// 	     				TAX_MODELO => [ 'name'=> TAX_MODELO, 
+	// 	     								'value'=> $modelos,
+	// 	           						  	'is_visible' => '1', 
+	// 	           						  	'is_variation' => '0', 
+	// 	           						  	'is_taxonomy' => '1' ]
+	// 					  ];
+
+	// 	error_log( 'Graba producto' );
+	// 	update_post_meta( $product_id, '_product_attributes', $meta_data_post );
+	// 	error_log( 'Fin graba producto' );
+
+
+	// }
+
+
+
+
+
+
+	// error_log( print_r( $modelos, true) );
+	// wp_set_object_terms( $product_id, );
 
 	// error_log( print_r( $data['attribute_values'][$index], true) );
 
@@ -192,7 +319,7 @@ class Illantas_Woo_Admin {
 
 
 
-} // class
+
 
 
 
@@ -225,6 +352,15 @@ class Illantas_Woo_Admin {
 	// public function illantas_admin_relations(){
 	// 	//include_once ILLANTAS_DIR . 'admin/partials/illantas-woo-admin-display.php';
 	// }
+
+
+
+		//error_log( print_r( $modelos, true ) );
+		// foreach ( $arr_before as $item ){
+		// 	if ( ! in_array( $item, $arr_after ) ){
+		// 		// eliminamos modelos
+		// 	}
+		// }
 
 
 

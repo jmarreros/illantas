@@ -35,6 +35,7 @@ define( 'TAX_MARCA', 'pa_marca');
 define( 'TAX_MODELO', 'pa_modelo');
 define( 'TERM_META', 'sel-marcas');
 define( 'POST_META_MARCA', '_saved-marcas' );
+define( 'TRANSIENT_MARCAS_GRABAR', 'illantas_marcas_grabar');
 
 //===============
 
