@@ -156,7 +156,7 @@ class Illantas_Woo {
 		$this->loader->add_action( 'updated_post_meta', $plugin_admin, 'illantas_update_post_meta', 10, 4);
 
 
-		$this->loader->add_action( 'admin_menu', $plugin_admin, 'illantas_admin_menu', 99 );
+		// $this->loader->add_action( 'admin_menu', $plugin_admin, 'illantas_admin_menu', 99 );
 
 		// agrega campo marca en taxonomia modelo
 		$this->loader->add_action( TAX_MODELO.'_edit_form_fields', $plugin_admin, 'add_marcas_field', 10, 2);

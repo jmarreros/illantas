@@ -125,40 +125,38 @@ class Illantas_Woo_Admin {
 
 		if( $meta_key == '_edit_lock' ) {
 
-			$modelos_transient = get_transient( TRANSIENT_MARCAS_GRABAR . '|' . $post_id );
+			$nombre_transient = TRANSIENT_MARCAS_GRABAR . '|' . $post_id;
+			$modelos = get_transient( $nombre_transient );
+			$meta_data_post = Array();			
 
-			error_log( print_r( $modelos_transient, true ) );
-
-	        $product_id = 68;
-
-			$modelos[] = 35;
-			$modelos[] = 36;
+			if ( ! $modelos ) return; // validación
 
 
-			$meta_tmp = get_post_meta($product_id, '_product_attributes', true);
+			$modelos_anteriores =  wp_get_object_terms( $post_id, TAX_MODELO );
 
-			$meta_data_post = Array();
-			
-
-			foreach ($meta_tmp as $item) {
-				$meta_data_post[ $item['name'] ] = $item;
+			foreach ($modelos_anteriores as $item) {
+				$modelos[] = $item->term_id;
 			}
 
-			wp_set_object_terms( $product_id, $modelos, TAX_MODELO ); // agregamos modelos
+
+			// Obtenemos los atributos guardados por Woocommerce
+			$meta_tmp = get_post_meta( $post_id, '_product_attributes', true );
+
+			foreach ($meta_tmp as $item) {
+				$meta_data_post[ $item['name'] ] = $item; // Guardamos los atributos en un array
+			}
+
+			wp_set_object_terms( $post_id, $modelos, TAX_MODELO ); // agregamos los atributos de modelo modelos
 			$meta_data_post[TAX_MODELO] = [ 'name'=> TAX_MODELO, 
-		     								'value'=> $modelos,
+		     								'value'=> '',
 		           						  	'is_visible' => '1',
 		           						  	'position' => '2',
 		           						  	'is_variation' => '0', 
 		           						  	'is_taxonomy' => '1' ];
-	
+			
+			update_post_meta( $post_id, '_product_attributes', $meta_data_post );
 
-			//$meta_data_post[] =  $meta_tmp;
-
-			error_log( print_r( "Entro metaaa", true ) );
-
-			update_post_meta( $product_id, '_product_attributes', $meta_data_post );
-
+			//delete_transient( $nombre_transient ); // Eliminamos transient
     	}
 
     }
