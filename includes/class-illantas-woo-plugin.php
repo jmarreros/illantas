@@ -117,7 +117,7 @@ class Illantas_Woo {
 		 * The class responsible for defining all actions that occur in the public-facing
 		 * side of the site.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-illantas-woo-public.php';
+		//require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-illantas-woo-public.php';
 
 		$this->loader = new Illantas_Woo_Loader();
 
@@ -165,6 +165,10 @@ class Illantas_Woo {
 		// graba cambios en taxonomia modelo
 		$this->loader->add_action( 'edited_'.TAX_MODELO, $plugin_admin, 'save_marcas_fields', 10, 2);
 		$this->loader->add_action( 'created_'.TAX_MODELO, $plugin_admin, 'save_marcas_fields', 10, 2);
+
+		//Importer CSV hooks
+		$this->loader->add_filter( 'woocommerce_product_import_before_process_item', $plugin_admin, 'illantas_csv_before_import', 10, 1);
+		$this->loader->add_filter( 'woocommerce_product_import_inserted_product_object', $plugin_admin, 'illantas_csv_after_import', 10, 2);
 
 	} // define_admin_hooks()
 

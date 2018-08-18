@@ -21,7 +21,7 @@
  * @author 			jmarreros
  */
 
-include_once ILLANTAS_DIR . 'includes/class-illantas-woo-relations.php';		
+include_once ILLANTAS_DIR . 'includes/class-illantas-woo-relations.php';
 
 
 class Illantas_Woo_Admin {
@@ -61,62 +61,35 @@ class Illantas_Woo_Admin {
 
 	// Menú bajo Woocommerce
 	public function illantas_admin_menu() {
-		
+
 		add_submenu_page( 'woocommerce',
 						'iLlantas',
 						'iLlantas',
-						'manage_options', 
+						'manage_options',
 						'illantas',
-						array( $this, 'illantas_admin_relations') );
+						array( $this, 'illantas_admin_prueba_menu') );
 
 	}
 
 
 	// Muestra la opción de menú
-	public function illantas_admin_relations(){
-		// include_once ILLANTAS_DIR . 'includes/class-illantas-woo-relations.php';		
-		// $rel = new Illantas_Woo_Relations();
-		// $arr = $rel->get_modelos_marca( 34 );
-
-		// print_r($arr);
-
-		// $product_id = 68;
-
-		// $modelos[] = 35;
-		// $modelos[] = 36;
-
-
-		// wp_set_object_terms( $product_id, $modelos, TAX_MODELO ); // agregamos modelos
-		// $meta_data_post = [
-		//      				TAX_MODELO => [ 'name'=> TAX_MODELO, 
-		//      								'value'=> $modelos,
-		//            						  	'is_visible' => '1', 
-		//            						  	'is_variation' => '0', 
-		//            						  	'is_taxonomy' => '1' ]
-		// 				  ];
-
-		// update_post_meta( $product_id, '_product_attributes', $meta_data_post );
-
-
-
-
-
-		echo "hola";
+	public function illantas_admin_prueba_menu(){
+//
 	}
 
 	// Agregar campo adicional a la taxonomia pa_modelos
 	public function add_marcas_field( $taxonomy ) {
-		include_once ILLANTAS_DIR . 'admin/partials/illantas-woo-field-term-display.php';		
+		include_once ILLANTAS_DIR . 'admin/partials/illantas-woo-field-term-display.php';
 	}
 
 
 	// Graba las marcas del campo añadido
-	public function save_marcas_fields( $term_id ) {  
+	public function save_marcas_fields( $term_id ) {
 	    if ( isset( $_POST['sel-marcas'] ) ) {
 	    	$id_marca = $_POST['sel-marcas'];
 	        update_term_meta( $term_id, TERM_META, $id_marca );
-	    }  
-	}  
+	    }
+	}
 
 
 
@@ -127,7 +100,7 @@ class Illantas_Woo_Admin {
 
 			$nombre_transient = TRANSIENT_MARCAS_GRABAR . '|' . $post_id;
 			$modelos = get_transient( $nombre_transient );
-			$meta_data_post = Array();			
+			$meta_data_post = Array();
 
 			if ( ! $modelos ) return; // validación
 
@@ -147,13 +120,13 @@ class Illantas_Woo_Admin {
 			}
 
 			wp_set_object_terms( $post_id, $modelos, TAX_MODELO ); // agregamos los atributos de modelo modelos
-			$meta_data_post[TAX_MODELO] = [ 'name'=> TAX_MODELO, 
+			$meta_data_post[TAX_MODELO] = [ 'name'=> TAX_MODELO,
 		     								'value'=> '',
 		           						  	'is_visible' => '1',
 		           						  	'position' => '2',
-		           						  	'is_variation' => '0', 
+		           						  	'is_variation' => '0',
 		           						  	'is_taxonomy' => '1' ];
-			
+
 			update_post_meta( $post_id, '_product_attributes', $meta_data_post );
 
 			//delete_transient( $nombre_transient ); // Eliminamos transient
@@ -177,9 +150,9 @@ class Illantas_Woo_Admin {
 			if ( in_array( TAX_MARCA , $attrs_names ) ){
 
 				//consistencia en caso elimine el atributo y luego lo agregue, siempre recupera el último
-				$keys_marcas = array_keys( $attrs_names , TAX_MARCA ); 
-				$index = end( $keys_marcas ); 
-				
+				$keys_marcas = array_keys( $attrs_names , TAX_MARCA );
+				$index = end( $keys_marcas );
+
 				//verificar si existen valores de marcas
 				if ( isset( $data['attribute_values'] ) && array_key_exists( $index, $data['attribute_values'] ) ) {
 					$attrs_values = $data['attribute_values'][$index]; // recupero todos los valores de marcas
@@ -192,7 +165,7 @@ class Illantas_Woo_Admin {
 
 
 			// actualizo los valores de las marcas actuales
-			update_post_meta( $product_id, POST_META_MARCA, $attrs_values ); 
+			update_post_meta( $product_id, POST_META_MARCA, $attrs_values );
 
 		}
 
@@ -200,7 +173,7 @@ class Illantas_Woo_Admin {
 
 	// Almacenamiento temporal de los modelos de las marcas agregadas
 	private function transient_add_attributes( $product_id, $arr_before, $arr_after ){
-		
+
 		if ( ! $product_id ) return;
 
 		$rel = new Illantas_Woo_Relations();
@@ -218,6 +191,30 @@ class Illantas_Woo_Admin {
 	}
 
 
+
+	public function illantas_csv_before_import($data){
+		$id = $data['id'];
+		$product = wc_get_product( $id );
+
+		error_log('Producto:');
+		error_log(print_r($product,true));
+
+		error_log('Datos:');
+		error_log(print_r($data,true));
+
+		// error_log('Importar');
+		// error_log( print_r($data, true) );
+	}
+
+
+	public function illantas_csv_after_import($object, $data){
+		// error_log('Object');
+		// error_log(print_r($object,true));
+		// error_log('Data');
+		// error_log( print_r($data, true) );
+	}
+
+
 } // class
 
 
@@ -225,140 +222,27 @@ class Illantas_Woo_Admin {
 
 
 
+		// include_once ILLANTAS_DIR . 'includes/class-illantas-woo-relations.php';
+		// $rel = new Illantas_Woo_Relations();
+		// $arr = $rel->get_modelos_marca( 34 );
 
-	// Después de grabar un producto
-	// public function illantas_save_product( $post_id, $post, $update ) {
-		
-	// 	$product_id = 68;
+		// print_r($arr);
 
-	// 	$modelos[] = 35;
-	// 	$modelos[] = 36;
+		// $product_id = 68;
 
-
-	// 	wp_set_object_terms( $product_id, $modelos, TAX_MODELO ); // agregamos modelos
-	// 	$meta_data_post = [
-	// 	     				TAX_MODELO => [ 'name'=> TAX_MODELO, 
-	// 	     								'value'=> $modelos,
-	// 	           						  	'is_visible' => '1', 
-	// 	           						  	'is_variation' => '0', 
-	// 	           						  	'is_taxonomy' => '1' ]
-	// 					  ];
-
-	// 	error_log( 'Graba producto' );
-	// 	update_post_meta( $product_id, '_product_attributes', $meta_data_post );
-	// 	error_log( 'Fin graba producto' );
+		// $modelos[] = 35;
+		// $modelos[] = 36;
 
 
-	// }
+		// wp_set_object_terms( $product_id, $modelos, TAX_MODELO ); // agregamos modelos
+		// $meta_data_post = [
+		//      				TAX_MODELO => [ 'name'=> TAX_MODELO,
+		//      								'value'=> $modelos,
+		//            						  	'is_visible' => '1',
+		//            						  	'is_variation' => '0',
+		//            						  	'is_taxonomy' => '1' ]
+		// 				  ];
 
-
-
-
-
-
-	// error_log( print_r( $modelos, true) );
-	// wp_set_object_terms( $product_id, );
-
-	// error_log( print_r( $data['attribute_values'][$index], true) );
-
-	// Después de grabar un producto
-	// public function illantas_save_product( $post_id, $post, $update ) {
-
-
-	// 	// 	$terms = wp_get_post_terms( $post_id, 'pa_marca' );
-
-	// 	// 	error_log( print_r( $terms, true ) );
-
-
-	// 	// // error_log( print_r($post, true) );
-
-	// 	// if ( $post_id ){ //edición
-
-	// 		// $product = wc_get_product( $post_id );
-	// 		// $attrs = $product->get_attributes();
-
-
-
-	// 		// error_log( print_r( $attrs, true ) );
-
-	// 		// if ( isset( $attrs['pa_marca'] ) ){
-	// 		// 	error_log( print_r( $attrs['pa_marca'], true ) );
-	// 		// }
-
-	// 		// $saved_marcas =  get_post_meta( $post_id, POST_META_MARCA, true );
-
-	// 		// foreach ( $saved_marcas as $marca ) {
-				
-	// 		// }
-
-	// 	}
-	 //    $product = wc_get_product( $post_id );
-	    
-	 //    $attr = $product->get_attributes();
-
-		// $brands = wp_get_post_terms( $post_id, 'product_brand', ['fields' => 'all']);
-
-		// $marcas = wp_get_post_terms( $post_id, 'pa_marca' );
-		
-		// error_log( print_r( $brands, true ) );
-		// error_log( print_r( $marcas, true ) );
-
-	 //    // foreach ($attr as $key => $value) {
-	 //    // 	error_log( print_r( $value, true ) );
-	 //    // }
-
-	 //    // error_log($update);
-
-	// }
-
-
-
-
-
-
-
-
-
-
-
-
-	// public function enqueue_styles() {
-	// 	wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/illantas-woo-admin.css', array(), $this->version, 'all' );
-	// } // enqueue_styles()
-
-
-	// public function enqueue_scripts() {
-	// 	wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/illantas-woo-admin.js', array( 'jquery' ), $this->version, false );
-	// } // enqueue_scripts()
-
-
-
-	// Menú bajo Woocommerce
-	// public function illantas_admin_menu() {
-		
-	// 	add_submenu_page( 'woocommerce',
-	// 					'iLlantas',
-	// 					'iLlantas',
-	// 					'manage_options', 
-	// 					'illantas',
-	// 					array( $this, 'illantas_admin_relations') );
-
-	// }
-
-
-	// // Muestra la opción de menú
-	// public function illantas_admin_relations(){
-	// 	//include_once ILLANTAS_DIR . 'admin/partials/illantas-woo-admin-display.php';
-	// }
-
-
-
-		//error_log( print_r( $modelos, true ) );
-		// foreach ( $arr_before as $item ){
-		// 	if ( ! in_array( $item, $arr_after ) ){
-		// 		// eliminamos modelos
-		// 	}
-		// }
-
+		// update_post_meta( $product_id, '_product_attributes', $meta_data_post );
 
 

@@ -27,7 +27,7 @@ if ( ! defined( 'WPINC' ) ) {
 
 // PLUGIN CONSTANS
 //===============
-define( 'ILLANTAS_TABLE', 'illantas_relations' ); 
+
 define( 'ILLANTAS_DIR', plugin_dir_path( __FILE__ ) );
 define( 'ILLANTAS_URL', plugin_dir_url( __FILE__ ) );
 
@@ -39,19 +39,6 @@ define( 'TRANSIENT_MARCAS_GRABAR', 'illantas_marcas_grabar');
 
 //===============
 
-
-function activate_illantas_woo() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-illantas-woo-activator.php';
-	Illantas_Woo_Activator::activate();
-}
-
-function deactivate_illantas_woo() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-illantas-woo-deactivator.php';
-	Illantas_Woo_Deactivator::deactivate();
-}
-
-register_activation_hook( __FILE__, 'activate_illantas_woo' );
-register_deactivation_hook( __FILE__, 'deactivate_illantas_woo' );
 
 /**
  * The core plugin class that is used to define internationalization,
