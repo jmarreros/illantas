@@ -155,10 +155,12 @@ class Illantas_Woo {
 		$this->loader->add_action( 'wp_ajax_woocommerce_save_attributes', $plugin_admin, 'illantas_save_attributes', 10);
 		$this->loader->add_action( 'updated_post_meta', $plugin_admin, 'illantas_update_post_meta', 10, 4);
 
+		// Regulariza las marcas/modelos manualmente
+		$this->loader->add_action( 'admin_menu', $plugin_admin, 'illantas_admin_menu', 99 );
+		$this->loader->add_action( 'wp_ajax_illantas_regulariza', $plugin_admin, 'illantas_regulariza_ajax' );
 
-		// $this->loader->add_action( 'admin_menu', $plugin_admin, 'illantas_admin_menu', 99 );
 
-		// agrega campo marca en taxonomia modelo
+		// Agrega campo marca en taxonomia modelo
 		$this->loader->add_action( TAX_MODELO.'_edit_form_fields', $plugin_admin, 'add_marcas_field', 10, 2);
 		$this->loader->add_action( TAX_MODELO.'_add_form_fields', $plugin_admin, 'add_marcas_field', 10, 2);
 
@@ -166,9 +168,9 @@ class Illantas_Woo {
 		$this->loader->add_action( 'edited_'.TAX_MODELO, $plugin_admin, 'save_marcas_fields', 10, 2);
 		$this->loader->add_action( 'created_'.TAX_MODELO, $plugin_admin, 'save_marcas_fields', 10, 2);
 
-		//Importer CSV hooks
-		$this->loader->add_filter( 'woocommerce_product_import_before_process_item', $plugin_admin, 'illantas_csv_before_import', 10, 1);
-		$this->loader->add_filter( 'woocommerce_product_import_inserted_product_object', $plugin_admin, 'illantas_csv_after_import', 10, 2);
+		// //Importer CSV hooks
+		// $this->loader->add_filter( 'woocommerce_product_import_before_process_item', $plugin_admin, 'illantas_csv_before_import', 10, 1);
+		// $this->loader->add_filter( 'woocommerce_product_import_inserted_product_object', $plugin_admin, 'illantas_csv_after_import', 10, 2);
 
 	} // define_admin_hooks()
 

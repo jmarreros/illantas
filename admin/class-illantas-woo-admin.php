@@ -59,23 +59,37 @@ class Illantas_Woo_Admin {
 	} // __ construct()
 
 
+	//=== Agrega o edita campo marca en taxonomia modelo ===
+	// =======================================================
+
+
 	// Menú bajo Woocommerce
 	public function illantas_admin_menu() {
-
 		add_submenu_page( 'woocommerce',
-						'iLlantas',
-						'iLlantas',
+						'Regulariza Marcas y Modelos',
+						'Regulariza Modelos',
 						'manage_options',
-						'illantas',
-						array( $this, 'illantas_admin_prueba_menu') );
+						'illantas-regulariza',
+						array( $this, 'illantas_admin_regulariza_modelos') );
+	}
 
+	// Muestra la opción de menú de regularización marca modelo
+	public function illantas_admin_regulariza_modelos(){
+			include_once ILLANTAS_DIR . 'admin/partials/illantas-woo-regulariza-display.php';
+	}
+
+	public function illantas_regulariza_ajax(){
+		for ($i=1;$i<5;$i++){
+			sleep(1);
+		}
+		echo "For finalizado";
+		wp_die();
 	}
 
 
-	// Muestra la opción de menú
-	public function illantas_admin_prueba_menu(){
-//
-	}
+
+	//=== Agrega o edita campo marca en taxonomia modelo ===
+	// =======================================================
 
 	// Agregar campo adicional a la taxonomia pa_modelos
 	public function add_marcas_field( $taxonomy ) {
@@ -93,7 +107,10 @@ class Illantas_Woo_Admin {
 
 
 
-// Grabado al final de todo grabado del producto
+	//=== Grabado de autocompletado campo modelo en base a marca en el detalle de producto ===
+	// =========================================================================================
+
+	// Grabado al final de todo grabado del producto
 	public function illantas_update_post_meta( $meta_id, $post_id, $meta_key, $meta_value ){
 
 		if( $meta_key == '_edit_lock' ) {
@@ -103,7 +120,6 @@ class Illantas_Woo_Admin {
 			$meta_data_post = Array();
 
 			if ( ! $modelos ) return; // validación
-
 
 			$modelos_anteriores =  wp_get_object_terms( $post_id, TAX_MODELO );
 
@@ -163,10 +179,8 @@ class Illantas_Woo_Admin {
 			// Agrego o elimino modelos de acuerdo a la comparación de arrays de marcas
 			$this->transient_add_attributes( $product_id, $product_meta, $attrs_values );
 
-
 			// actualizo los valores de las marcas actuales
 			update_post_meta( $product_id, POST_META_MARCA, $attrs_values );
-
 		}
 
 	}
@@ -192,57 +206,58 @@ class Illantas_Woo_Admin {
 
 
 
-	public function illantas_csv_before_import($data){
-		$id = $data['id'];
-		$product = wc_get_product( $id );
-
-		error_log('Producto:');
-		error_log(print_r($product,true));
-
-		error_log('Datos:');
-		error_log(print_r($data,true));
-
-		// error_log('Importar');
-		// error_log( print_r($data, true) );
-	}
-
-
-	public function illantas_csv_after_import($object, $data){
-		// error_log('Object');
-		// error_log(print_r($object,true));
-		// error_log('Data');
-		// error_log( print_r($data, true) );
-	}
-
-
 } // class
 
 
 
 
 
+// public function illantas_csv_before_import($data){
+// 	$id = $data['id'];
+// 	$product = wc_get_product( $id );
 
-		// include_once ILLANTAS_DIR . 'includes/class-illantas-woo-relations.php';
-		// $rel = new Illantas_Woo_Relations();
-		// $arr = $rel->get_modelos_marca( 34 );
+// 	error_log('Producto:');
+// 	error_log(print_r($product,true));
 
-		// print_r($arr);
+// 	error_log('Datos:');
+// 	error_log(print_r($data,true));
 
-		// $product_id = 68;
+// 	// error_log('Importar');
+// 	// error_log( print_r($data, true) );
+// }
 
-		// $modelos[] = 35;
-		// $modelos[] = 36;
+
+// public function illantas_csv_after_import($object, $data){
+// 	// error_log('Object');
+// 	// error_log(print_r($object,true));
+// 	// error_log('Data');
+// 	// error_log( print_r($data, true) );
+// }
 
 
-		// wp_set_object_terms( $product_id, $modelos, TAX_MODELO ); // agregamos modelos
-		// $meta_data_post = [
-		//      				TAX_MODELO => [ 'name'=> TAX_MODELO,
-		//      								'value'=> $modelos,
-		//            						  	'is_visible' => '1',
-		//            						  	'is_variation' => '0',
-		//            						  	'is_taxonomy' => '1' ]
-		// 				  ];
+// include_once ILLANTAS_DIR . 'includes/class-illantas-woo-relations.php';
+// $rel = new Illantas_Woo_Relations();
+// $arr = $rel->get_modelos_marca( 34 );
 
-		// update_post_meta( $product_id, '_product_attributes', $meta_data_post );
+// print_r($arr);
+
+// $product_id = 68;
+
+// $modelos[] = 35;
+// $modelos[] = 36;
+
+
+// wp_set_object_terms( $product_id, $modelos, TAX_MODELO ); // agregamos modelos
+// $meta_data_post = [
+//      				TAX_MODELO => [ 'name'=> TAX_MODELO,
+//      								'value'=> $modelos,
+//            						  	'is_visible' => '1',
+//            						  	'is_variation' => '0',
+//            						  	'is_taxonomy' => '1' ]
+// 				  ];
+
+// update_post_meta( $product_id, '_product_attributes', $meta_data_post );
+
+
 
 
