@@ -79,10 +79,33 @@ class Illantas_Woo_Admin {
 	}
 
 	public function illantas_regulariza_ajax(){
-		for ($i=1;$i<5;$i++){
-			sleep(1);
+
+		$rel = new Illantas_Woo_Relations();
+		$modelos_marca = $rel->get_all_modelos_marca();  //para una marca específi a $modelos_marca[marca] retorna un array() de modelos
+
+		// Obtenemos todos los productos, solo me interesa el id del producto
+		$products = wc_get_products( ['return' => 'ids', 'limit' => -1]);
+
+		foreach ( $products as $id_product ){
+			//recupero todas las marcas por producto
+			$term_marcas_producto = get_the_terms($id_product, TAX_MARCA);
+
+			// Inicializa el array de modelos y limpia el atributo, para poner la función como append = true
+			$modelos = array();
+			wp_set_object_terms( $id_product, $modelos, TAX_MODELO );
+
+			// Obtengo todos los modelos de todas las marcas para el producto
+			foreach($term_marcas_producto as $item){
+				$modelos = array_merge( $modelos, $modelos_marca[$item->term_id]);
+			}
+
+			//Actualizo el atributo de modelos
+			wp_set_object_terms( $id_product, $modelos, TAX_MODELO);
+
+			$rel->save_post_meta_attributes( $id_product, $modelos ); //grabar en el post_meta
 		}
-		echo "For finalizado";
+
+
 		wp_die();
 	}
 
@@ -117,7 +140,7 @@ class Illantas_Woo_Admin {
 
 			$nombre_transient = TRANSIENT_MARCAS_GRABAR . '|' . $post_id;
 			$modelos = get_transient( $nombre_transient );
-			$meta_data_post = Array();
+
 
 			if ( ! $modelos ) return; // validación
 
@@ -127,23 +150,8 @@ class Illantas_Woo_Admin {
 				$modelos[] = $item->term_id;
 			}
 
-
-			// Obtenemos los atributos guardados por Woocommerce
-			$meta_tmp = get_post_meta( $post_id, '_product_attributes', true );
-
-			foreach ($meta_tmp as $item) {
-				$meta_data_post[ $item['name'] ] = $item; // Guardamos los atributos en un array
-			}
-
-			wp_set_object_terms( $post_id, $modelos, TAX_MODELO ); // agregamos los atributos de modelo modelos
-			$meta_data_post[TAX_MODELO] = [ 'name'=> TAX_MODELO,
-		     								'value'=> '',
-		           						  	'is_visible' => '1',
-		           						  	'position' => '2',
-		           						  	'is_variation' => '0',
-		           						  	'is_taxonomy' => '1' ];
-
-			update_post_meta( $post_id, '_product_attributes', $meta_data_post );
+			$rel = new Illantas_Woo_Relations();
+			$rel->save_post_meta_attributes( $post_id, $modelos ); //grabar en el post_meta
 
 			//delete_transient( $nombre_transient ); // Eliminamos transient
     	}

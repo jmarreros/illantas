@@ -42,4 +42,46 @@ class Illantas_Woo_Relations {
 		return $modelos_marca;
 	}
 
+	// Obtiene todos los modelos relacionados con su marca a la que pertenece
+	// en formato de array multidimensional con el key inicial como marca
+	// $modelo_marca[marca][]=modelo
+	public function get_all_modelos_marca(){
+		$terms_modelo = $this->get_modelos();
+		$modelo_marca = array();
+
+		foreach($terms_modelo as $item){
+			$marca =  (int)get_term_meta( $item->term_id, TERM_META, true );
+			if ( $marca ){
+				$modelo_marca[$marca][] = $item->term_id;
+			}
+
+		}
+
+		return $modelo_marca;
+	}
+
+	// Grabar datos en atributos de WooCommerce también en el post_meta
+	public function save_post_meta_attributes($post_id, $modelos){
+
+		$meta_data_post = Array();
+
+		// Obtenemos los atributos guardados por Woocommerce
+		$meta_tmp = get_post_meta( $post_id, '_product_attributes', true );
+
+		foreach ($meta_tmp as $item) {
+			$meta_data_post[ $item['name'] ] = $item; // Guardamos los atributos en un array
+		}
+
+		wp_set_object_terms( $post_id, $modelos, TAX_MODELO ); // agregamos los atributos de modelo modelos
+		$meta_data_post[TAX_MODELO] = [ 'name'=> TAX_MODELO,
+										'value'=> $modelos,
+										'is_visible' => '1',
+										'position' => '2',
+										'is_variation' => '0',
+										'is_taxonomy' => '1' ];
+
+		update_post_meta( $post_id, '_product_attributes', $meta_data_post );
+	}
+
+
 } // class
