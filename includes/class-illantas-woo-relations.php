@@ -81,6 +81,7 @@ class Illantas_Woo_Relations {
 										'is_taxonomy' => '1' ];
 
 		update_post_meta( $post_id, '_product_attributes', $meta_data_post );
+		update_post_meta( $post_id, PRODUCT_EXIST, true );
 	}
 
 

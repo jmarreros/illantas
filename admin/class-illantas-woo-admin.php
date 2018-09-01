@@ -84,9 +84,23 @@ class Illantas_Woo_Admin {
 		$modelos_marca = $rel->get_all_modelos_marca();  //para una marca específi a $modelos_marca[marca] retorna un array() de modelos
 
 		// Obtenemos todos los productos, solo me interesa el id del producto
-		$products = wc_get_products( ['return' => 'ids', 'limit' => -1]);
+		$args     = [
+					'post_type' => 'product',
+					'posts_per_page' => -1
+					];
+		$products = get_posts( $args );
 
-		foreach ( $products as $id_product ){
+
+		//Recorremos todos los productos obtenidos
+		foreach ( $products as $product ){
+
+			$id_product = $product->ID;
+
+			//Validamos para saber si es un nuevo producto
+			if ( get_post_meta( $id_product, PRODUCT_EXIST, true) ) {
+				continue;
+			}
+
 			//recupero todas las marcas por producto
 			$term_marcas_producto = get_the_terms($id_product, TAX_MARCA);
 
@@ -96,13 +110,18 @@ class Illantas_Woo_Admin {
 
 			// Obtengo todos los modelos de todas las marcas para el producto
 			foreach($term_marcas_producto as $item){
-				$modelos = array_merge( $modelos, $modelos_marca[$item->term_id]);
+				if ( array_key_exists( $item->term_id, $modelos_marca ) ){
+					$modelos = array_merge( $modelos, $modelos_marca[$item->term_id]);
+				}
 			}
 
 			//Actualizo el atributo de modelos
 			wp_set_object_terms( $id_product, $modelos, TAX_MODELO);
 
 			$rel->save_post_meta_attributes( $id_product, $modelos ); //grabar en el post_meta
+
+			//Actualizamos estado de la meta para la validación
+			update_post_meta( $id_product, PRODUCT_EXIST, true );
 		}
 
 
@@ -265,6 +284,13 @@ class Illantas_Woo_Admin {
 // 				  ];
 
 // update_post_meta( $product_id, '_product_attributes', $meta_data_post );
+
+// $products = wc_get_products(
+// 	[
+// 		'return' => 'ids',
+// 		'limit' => -1
+// 	]
+// );
 
 
 
