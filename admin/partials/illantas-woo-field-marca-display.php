@@ -9,16 +9,16 @@ if ( isset ( $taxonomy->term_id ) ){ //Edición del term (pa_modelo)
 	$term_id = $taxonomy->term_id; // pa_modelo
 	$sel_marca = get_term_meta( $term_id , TERM_META , true); // term_meta sel-marca
 	?>
-	<tr class="form-field">  
-	    <th scope="row">  
+	<tr class="form-field">
+	    <th scope="row">
 	        <label for="sel-marcas">Marca</label>
-	    </th>  
+	    </th>
 		<td>
 	       <?php make_select_marcas( $terms_marca, $sel_marca ); ?>
-	    </td>  
+	    </td>
 	</tr>
 
-<?php } else { // nuevo term (pa_modelo) ?> 
+<?php } else { // nuevo term (pa_modelo) ?>
 
 	<div class="form-field term-sel-marcas-wrap">
 		<label for="sel-marcas">Marca</label>
@@ -38,4 +38,3 @@ function  make_select_marcas( $terms_marca, $sel_marca ){ ?>
     <p class="description">Selecciona una marca para el modelo</p>
 <?php }
 
-	   

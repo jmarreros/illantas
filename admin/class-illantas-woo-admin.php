@@ -135,9 +135,8 @@ class Illantas_Woo_Admin {
 
 	// Agregar campo adicional a la taxonomia pa_modelos
 	public function add_marcas_field( $taxonomy ) {
-		include_once ILLANTAS_DIR . 'admin/partials/illantas-woo-field-term-display.php';
+		include_once ILLANTAS_DIR . 'admin/partials/illantas-woo-field-marca-display.php';
 	}
-
 
 	// Graba las marcas del campo añadido
 	public function save_marcas_fields( $term_id ) {
@@ -147,6 +146,22 @@ class Illantas_Woo_Admin {
 	    }
 	}
 
+
+	//=== Agrega o edita campo anclaje en taxonomia modelo ===
+	// =======================================================
+
+	// Agregar campo adicional a la taxonomia pa_modelos
+	public function add_anclajes_field( $taxonomy ) {
+		include_once ILLANTAS_DIR . 'admin/partials/illantas-woo-field-anclaje-display.php';
+	}
+
+	// Graba las marcas del campo añadido
+	public function save_anclajes_fields( $term_id ) {
+	    // if ( isset( $_POST['sel-marcas'] ) ) {
+	    // 	$id_marca = $_POST['sel-marcas'];
+	    //     update_term_meta( $term_id, TERM_META, $id_marca );
+	    // }
+	}
 
 
 	//=== Grabado de autocompletado campo modelo en base a marca en el detalle de producto ===

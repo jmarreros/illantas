@@ -163,10 +163,18 @@ class Illantas_Woo {
 		// Agrega campo marca en taxonomia modelo
 		$this->loader->add_action( TAX_MODELO.'_edit_form_fields', $plugin_admin, 'add_marcas_field', 10, 2);
 		$this->loader->add_action( TAX_MODELO.'_add_form_fields', $plugin_admin, 'add_marcas_field', 10, 2);
-
 		// graba cambios en taxonomia modelo
 		$this->loader->add_action( 'edited_'.TAX_MODELO, $plugin_admin, 'save_marcas_fields', 10, 2);
 		$this->loader->add_action( 'created_'.TAX_MODELO, $plugin_admin, 'save_marcas_fields', 10, 2);
+
+
+		// Agrega campo anclaje en taxonomia modelo
+		$this->loader->add_action( TAX_MODELO.'_edit_form_fields', $plugin_admin, 'add_anclajes_field', 10, 2);
+		$this->loader->add_action( TAX_MODELO.'_add_form_fields', $plugin_admin, 'add_anclajes_field', 10, 2);
+		// graba cambios en taxonomia modelo
+		$this->loader->add_action( 'edited_'.TAX_MODELO, $plugin_admin, 'save_anclajes_fields', 10, 2);
+		$this->loader->add_action( 'created_'.TAX_MODELO, $plugin_admin, 'save_anclajes_fields', 10, 2);
+
 
 		// //Importer CSV hooks
 		// $this->loader->add_filter( 'woocommerce_product_import_before_process_item', $plugin_admin, 'illantas_csv_before_import', 10, 1);
