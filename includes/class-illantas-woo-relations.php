@@ -12,6 +12,12 @@
  */
 class Illantas_Woo_Relations {
 
+	// Recupera todas las anclas
+	public function get_anclajes(){
+		$terms_anclaje = get_terms( [ 'taxonomy' => TAX_ANCLAJE, 'hide_empty' => false ]);
+		return $terms_anclaje;
+	}
+
 	// Recupera todos las marcas
 	public function get_marcas(){
 		$terms_marca = get_terms( [ 'taxonomy' => TAX_MARCA, 'hide_empty' => false ]);
@@ -32,7 +38,7 @@ class Illantas_Woo_Relations {
 
 		// Buscamos en todos los modelos si tiene el meta de marca
 		foreach ($terms_modelo as $item) {
-			$marca = get_term_meta( $item->term_id, TERM_META, true );
+			$marca = get_term_meta( $item->term_id, TERM_META_MARCA, true );
 
 			if ( $marca == $id_marca ){ // sólo es un valor
 				$modelos_marca[] = $item->term_id;
@@ -50,7 +56,7 @@ class Illantas_Woo_Relations {
 		$modelo_marca = array();
 
 		foreach($terms_modelo as $item){
-			$marca =  (int)get_term_meta( $item->term_id, TERM_META, true );
+			$marca =  (int)get_term_meta( $item->term_id, TERM_META_MARCA, true );
 			if ( $marca ){
 				$modelo_marca[$marca][] = $item->term_id;
 			}

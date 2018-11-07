@@ -142,7 +142,7 @@ class Illantas_Woo_Admin {
 	public function save_marcas_fields( $term_id ) {
 	    if ( isset( $_POST['sel-marcas'] ) ) {
 	    	$id_marca = $_POST['sel-marcas'];
-	        update_term_meta( $term_id, TERM_META, $id_marca );
+	        update_term_meta( $term_id, TERM_META_MARCA, $id_marca );
 	    }
 	}
 
@@ -155,12 +155,12 @@ class Illantas_Woo_Admin {
 		include_once ILLANTAS_DIR . 'admin/partials/illantas-woo-field-anclaje-display.php';
 	}
 
-	// Graba las marcas del campo añadido
+	// Graba los anclajes del campo añadido
 	public function save_anclajes_fields( $term_id ) {
-	    // if ( isset( $_POST['sel-marcas'] ) ) {
-	    // 	$id_marca = $_POST['sel-marcas'];
-	    //     update_term_meta( $term_id, TERM_META, $id_marca );
-	    // }
+	    if ( isset( $_POST['sel-anclajes'] ) ) {
+	    	$id_anclaje = $_POST['sel-anclajes'];
+	        update_term_meta( $term_id, TERM_META_ANCLAJE, $id_anclaje );
+	    }
 	}
 
 

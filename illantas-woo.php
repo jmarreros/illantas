@@ -33,9 +33,17 @@ define( 'ILLANTAS_URL', plugin_dir_url( __FILE__ ) );
 
 define( 'TAX_MARCA', 'pa_marca');
 define( 'TAX_MODELO', 'pa_modelo');
-define( 'TERM_META', 'sel-marcas');
+define( 'TAX_ANCLAJE', 'pa_anclaje');
+
+define( 'TERM_META_MARCA', 'sel-marcas');
+define( 'TERM_META_ANCLAJE', 'sel-anclajes');
+
 define( 'POST_META_MARCA', '_saved-marcas' );
+define( 'POST_META_ANCLAJE', '_saved-anclajes' );
+
 define( 'TRANSIENT_MARCAS_GRABAR', 'illantas_marcas_grabar');
+define( 'TRANSIENT_ANCLAJES_GRABAR', 'illantas_anclajes_grabar');
+
 define( 'PRODUCT_EXIST', '_producto_existente' );
 
 //===============
