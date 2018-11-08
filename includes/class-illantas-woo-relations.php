@@ -78,7 +78,7 @@ class Illantas_Woo_Relations {
 			$meta_data_post[ $item['name'] ] = $item; // Guardamos los atributos en un array
 		}
 
-		wp_set_object_terms( $post_id, $modelos, TAX_MODELO ); // agregamos los atributos de modelo modelos
+		wp_set_object_terms( $post_id, $modelos, TAX_MODELO ); // agregamos los atributos de modelo marcas
 		$meta_data_post[TAX_MODELO] = [ 'name'=> TAX_MODELO,
 										'value'=> $modelos,
 										'is_visible' => '1',
@@ -86,8 +86,36 @@ class Illantas_Woo_Relations {
 										'is_variation' => '0',
 										'is_taxonomy' => '1' ];
 
+		// -- Grabar Anclajes
+
+		// Obtenemos todos los anclajes de los modelos
+		$anclajes = $this->get_anclas_modelos( $modelos );
+		if ( ! empty($anclajes) ){
+			wp_set_object_terms( $post_id, $anclajes, TAX_ANCLAJE ); // agregamos los atributos de modelos anclajes
+			$meta_data_post[TAX_ANCLAJE] = [ 'name'=> TAX_ANCLAJE,
+											'value'=> $anclajes,
+											'is_visible' => '1',
+											'position' => '2',
+											'is_variation' => '0',
+											'is_taxonomy' => '1' ];
+		}
+		// -- Fin Grabar Anclaje
+
 		update_post_meta( $post_id, '_product_attributes', $meta_data_post );
 		update_post_meta( $post_id, PRODUCT_EXIST, true );
+	}
+
+
+	// Por cada modelo añadido agregamos su anclaje correspondiente
+	private function get_anclas_modelos( $modelos){
+
+		$anclajes = array();
+		foreach($modelos as $modelo){
+			 $val =  (int)get_term_meta( $modelo, TERM_META_ANCLAJE, true );
+			 if ( $val ) $anclajes[] = $val;
+		}
+
+		return $anclajes;
 	}
 
 
