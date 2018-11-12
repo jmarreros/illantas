@@ -118,5 +118,53 @@ class Illantas_Woo_Relations {
 		return $anclajes;
 	}
 
+	// Regulariza los modelos de las marcas para nuevos productos
+	public function regularizacion_marcas_modelos(){
+
+		$modelos_marca = $this->get_all_modelos_marca();  //para una marca específi a $modelos_marca[marca] retorna un array() de modelos
+
+		// Obtenemos todos los productos, solo me interesa el id del producto
+		$args     = [
+					'post_type' => 'product',
+					'posts_per_page' => -1
+					];
+		$products = get_posts( $args );
+
+
+		//Recorremos todos los productos obtenidos
+		foreach ( $products as $product ){
+
+			$id_product = $product->ID;
+
+			//Validamos para saber si es un nuevo producto
+			if ( get_post_meta( $id_product, PRODUCT_EXIST, true) ) {
+				continue;
+			}
+
+			//recupero todas las marcas por producto
+			$term_marcas_producto = get_the_terms($id_product, TAX_MARCA);
+
+			// Inicializa el array de modelos y limpia el atributo, para poner la función como append = true
+			$modelos = array();
+			wp_set_object_terms( $id_product, $modelos, TAX_MODELO );
+
+			// Obtengo todos los modelos de todas las marcas para el producto
+			foreach($term_marcas_producto as $item){
+				if ( array_key_exists( $item->term_id, $modelos_marca ) ){
+					$modelos = array_merge( $modelos, $modelos_marca[$item->term_id]);
+				}
+			}
+
+			//Actualizo el atributo de modelos
+			wp_set_object_terms( $id_product, $modelos, TAX_MODELO);
+
+			$this->save_post_meta_attributes( $id_product, $modelos ); //grabar en el post_meta
+
+			//Actualizamos estado de la meta para la validación
+			update_post_meta( $id_product, PRODUCT_EXIST, true );
+		}
+
+	}
+
 
 } // class

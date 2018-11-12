@@ -1,7 +1,7 @@
 <h1 class="wp-heading-inline"> Regulariza Marcas / Modelos </h1>
 <hr class="wp-header-end">
 
-<p>La siguiente opción te permite regularizar los modelos de las marcas de los <strong>Nuevos Productos Importados</strong></p>
+<p>La siguiente opción te permite regularizar los <strong>modelos y anclajes</strong> de las marcas de los <strong>Nuevos Productos Importados</strong></p>
 
 <form id="frm-regulariza" method="post">
     <p class="submit">
