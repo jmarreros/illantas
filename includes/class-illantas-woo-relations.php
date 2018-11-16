@@ -30,6 +30,14 @@ class Illantas_Woo_Relations {
 		return $terms_modelo;
 	}
 
+
+
+
+
+
+
+	// ---- Anteriores ---
+
 	// Recupera todos los modelos de una marca pasandole el id
 	public function get_modelos_marca( $id_marca ){
 
@@ -47,6 +55,26 @@ class Illantas_Woo_Relations {
 
 		return $modelos_marca;
 	}
+
+	// Recupera todos los modelos de un anclaje pasandole el id
+	public function get_modelos_anclaje( $id_anclaje ){
+
+		$terms_modelo = $this->get_modelos();
+		$modelos_anclaje = array();
+
+		// Buscamos en todos los modelos si tiene el meta de marca
+		foreach ($terms_modelo as $item) {
+			$anclaje = get_term_meta( $item->term_id, TERM_META_ANCLAJE, true );
+
+			if ( $anclaje == $id_anclaje ){ // sólo es un valor
+				$modelos_anclaje[] = $item->term_id;
+			}
+		}
+
+		return $modelos_anclaje;
+	}
+
+
 
 	// Obtiene todos los modelos relacionados con su marca a la que pertenece
 	// en formato de array multidimensional con el key inicial como marca
@@ -88,18 +116,18 @@ class Illantas_Woo_Relations {
 
 		// -- Grabar Anclajes
 
-		// Obtenemos todos los anclajes de los modelos
-		$anclajes = $this->get_anclas_modelos( $modelos );
-		if ( ! empty($anclajes) ){
-			wp_set_object_terms( $post_id, $anclajes, TAX_ANCLAJE ); // agregamos los atributos de modelos anclajes
-			$meta_data_post[TAX_ANCLAJE] = [ 'name'=> TAX_ANCLAJE,
-											'value'=> $anclajes,
-											'is_visible' => '1',
-											'position' => '2',
-											'is_variation' => '0',
-											'is_taxonomy' => '1' ];
-		}
-		// -- Fin Grabar Anclaje
+		// // Obtenemos todos los anclajes de los modelos
+		// $anclajes = $this->get_anclas_modelos( $modelos );
+		// if ( ! empty($anclajes) ){
+		// 	wp_set_object_terms( $post_id, $anclajes, TAX_ANCLAJE ); // agregamos los atributos de modelos anclajes
+		// 	$meta_data_post[TAX_ANCLAJE] = [ 'name'=> TAX_ANCLAJE,
+		// 									'value'=> $anclajes,
+		// 									'is_visible' => '1',
+		// 									'position' => '2',
+		// 									'is_variation' => '0',
+		// 									'is_taxonomy' => '1' ];
+		// }
+		// // -- Fin Grabar Anclaje
 
 		update_post_meta( $post_id, '_product_attributes', $meta_data_post );
 		update_post_meta( $post_id, PRODUCT_EXIST, true );

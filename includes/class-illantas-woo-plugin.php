@@ -152,7 +152,8 @@ class Illantas_Woo {
 		$plugin_admin = new Illantas_Woo_Admin( $this->get_plugin_name(), $this->get_version() );
 
 		// graba cambios al grabar los atributos de un producto
-		$this->loader->add_action( 'wp_ajax_woocommerce_save_attributes', $plugin_admin, 'illantas_save_attributes', 10);
+		// $this->loader->add_action('woocommerce_process_product_meta_simple', $plugin_admin, 'illantas_save_attributes', 10);
+		$this->loader->add_action( 'wp_ajax_woocommerce_save_attributes', $plugin_admin, 'illantas_save_attributes', 0);
 		$this->loader->add_action( 'updated_post_meta', $plugin_admin, 'illantas_update_post_meta', 10, 4);
 
 		// Regulariza las marcas/modelos manualmente
@@ -175,6 +176,7 @@ class Illantas_Woo {
 		$this->loader->add_action( 'edited_'.TAX_MODELO, $plugin_admin, 'save_anclajes_fields', 10, 2);
 		$this->loader->add_action( 'created_'.TAX_MODELO, $plugin_admin, 'save_anclajes_fields', 10, 2);
 
+		// $this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_admin_styles' );
 
 		// //Importer CSV hooks
 		// $this->loader->add_filter( 'woocommerce_product_import_before_process_item', $plugin_admin, 'illantas_csv_before_import', 10, 1);
@@ -193,7 +195,7 @@ class Illantas_Woo {
 
 	// 	$plugin_public = new Illantas_Woo_Public( $this->get_plugin_name(), $this->get_version() );
 
-	// 	$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
+	// $this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 	// 	$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 
 	// } // define_public_hooks()

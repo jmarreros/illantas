@@ -59,6 +59,12 @@ class Illantas_Woo_Admin {
 	} // __ construct()
 
 
+	// Agrega archivo de estilos
+
+	public function enqueue_admin_styles(){
+		wp_enqueue_style('admin-styles', plugin_dir_url(__FILE__).'../assets/illantas.css');
+	}
+
 	//=== Agrega o edita campo marca en taxonomia modelo ===
 	// =======================================================
 
@@ -119,16 +125,72 @@ class Illantas_Woo_Admin {
 	    }
 	}
 
+	// Grabar y Autocompletar Modelos y Marcas de acuerdo al anclaje
+	// =================================================================
 
-	//=== Grabado de autocompletado campo modelo en base a marca en el detalle de producto ===
-	// =========================================================================================
+	// Función para grabar los atributos, llamada por ajax cuando se guarda atributos
+	public function illantas_save_attributes(){
+
+		if ( isset ( $_POST['post_id'] ) ){
+
+    		$product_id = absint($_POST['post_id']);
+			parse_str($_POST['data'], $data);
+
+			$attr_before = get_post_meta( $product_id, POST_META_ANCLAJE, true ); // recupero los valores guardados anteriormente
+			$attr_current = array(); // para recuperar los valores de los anclajes asignados recientemente
+			$attr_anclaje = $data['attribute_names']; // para comprobar si tiene atributo anclaje
+
+			if ( in_array( TAX_ANCLAJE , $attr_anclaje ) ){
+
+				//consistencia en caso elimine el atributo y luego lo agregue, siempre recupera el último
+				$keys_anclaje = array_keys( $attr_anclaje , TAX_ANCLAJE );
+				$index = end( $keys_anclaje );
+
+				//verificar si existen valores de anclaje
+				if ( isset( $data['attribute_values'] ) && array_key_exists( $index, $data['attribute_values'] ) ) {
+					$attr_current = $data['attribute_values'][$index]; // recupero todos los valores de anclajes
+				}
+			}
+
+			// Agrego o elimino modelos de acuerdo a la comparación de arrays de anclajes
+			$this->prepare_save_attributes( $product_id, $attr_before, $attr_current );
+
+			// actualizo los valores de los anclajes actuales
+			update_post_meta( $product_id, POST_META_ANCLAJE, $attr_current );
+		}
+
+		wp_die();
+	}
+
+
+	// Almacenamiento temporal de los modelos de los anclajes agregados en un transient
+	private function prepare_save_attributes( $product_id, $arr_before, $arr_after ){
+
+		if ( ! $product_id ) return;
+
+		$rel = new Illantas_Woo_Relations();
+		$modelos = Array();
+
+		foreach ( $arr_after as $item ){ //Agregar modelos
+			if ( ! in_array( $item, $arr_before ) ){
+				$modelos = array_merge( $modelos, $rel->get_modelos_anclaje( $item ) ); // un array continuo de elementos modelos
+			}
+		}
+
+		$transient_name = TRANSIENT_ANCLAJES_GRABAR . '|' . $product_id;
+		set_transient( $transient_name, $modelos, MINUTE_IN_SECONDS*5 );
+
+		// error_log(print_r($transient_name, true));
+
+	}
+
 
 	// Grabado al final de todo grabado del producto
 	public function illantas_update_post_meta( $meta_id, $post_id, $meta_key, $meta_value ){
 
 		if( $meta_key == '_edit_lock' ) {
 
-			$nombre_transient = TRANSIENT_MARCAS_GRABAR . '|' . $post_id;
+			$nombre_transient = TRANSIENT_ANCLAJES_GRABAR . '|' . $post_id;
 			$modelos = get_transient( $nombre_transient );
 
 
@@ -143,68 +205,144 @@ class Illantas_Woo_Admin {
 			$rel = new Illantas_Woo_Relations();
 			$rel->save_post_meta_attributes( $post_id, $modelos ); //grabar en el post_meta
 
-			//delete_transient( $nombre_transient ); // Eliminamos transient
+			// delete_transient( $nombre_transient ); // Eliminamos transient
     	}
-
-    }
-
-
-	// Save product attributes
-	public function illantas_save_attributes(){
-
-		if ( isset ( $_POST['post_id'] ) ){
-
-    		$product_id = absint($_POST['post_id']);
-			parse_str($_POST['data'], $data);
-
-			$product_meta = get_post_meta( $product_id, POST_META_MARCA, true ); // recupero los valores guardados anteriormente
-			$attrs_names = $data['attribute_names']; // para comprobar si tiene atributo marca
-			$attrs_values = array(); // para recuperar los valores de marcas que tiene
-
-			if ( in_array( TAX_MARCA , $attrs_names ) ){
-
-				//consistencia en caso elimine el atributo y luego lo agregue, siempre recupera el último
-				$keys_marcas = array_keys( $attrs_names , TAX_MARCA );
-				$index = end( $keys_marcas );
-
-				//verificar si existen valores de marcas
-				if ( isset( $data['attribute_values'] ) && array_key_exists( $index, $data['attribute_values'] ) ) {
-					$attrs_values = $data['attribute_values'][$index]; // recupero todos los valores de marcas
-				}
-
-			}
-
-			// Agrego o elimino modelos de acuerdo a la comparación de arrays de marcas
-			$this->transient_add_attributes( $product_id, $product_meta, $attrs_values );
-
-			// actualizo los valores de las marcas actuales
-			update_post_meta( $product_id, POST_META_MARCA, $attrs_values );
-		}
-
-	}
-
-	// Almacenamiento temporal de los modelos de las marcas agregadas
-	private function transient_add_attributes( $product_id, $arr_before, $arr_after ){
-
-		if ( ! $product_id ) return;
-
-		$rel = new Illantas_Woo_Relations();
-		$modelos = Array();
-
-		foreach ( $arr_after as $item ){ //Agregar modelos
-			if ( ! in_array( $item, $arr_before ) ){
-				$modelos = array_merge( $modelos, $rel->get_modelos_marca( $item ) ); // un array continuo de elementos modelos
-			}
-		}
-
-		$transient_name = TRANSIENT_MARCAS_GRABAR . '|' . $product_id;
-		set_transient( $transient_name, $modelos, MINUTE_IN_SECONDS*5 );
 
 	}
 
 
 
 } // class
+
+
+
+
+
+
+//			$this->save_post_meta_attributes($product_id, [35,36]);
+
+			// wc_delete_product_transients($product_id);
+
+			// WC_AJAX::save_attributes();
+
+			// wc_delete_product_transients($product_id);
+
+			// $product_meta = get_post_meta( $product_id, POST_META_MARCA, true ); // recupero los valores guardados anteriormente
+			// $attrs_names = $data['attribute_names']; // para comprobar si tiene atributo marca
+			// $attrs_values = array(); // para recuperar los valores de marcas que tiene
+
+			// if ( in_array( TAX_MARCA , $attrs_names ) ){
+
+			// 	//consistencia en caso elimine el atributo y luego lo agregue, siempre recupera el último
+			// 	$keys_marcas = array_keys( $attrs_names , TAX_MARCA );
+			// 	$index = end( $keys_marcas );
+
+			// 	//verificar si existen valores de marcas
+			// 	if ( isset( $data['attribute_values'] ) && array_key_exists( $index, $data['attribute_values'] ) ) {
+			// 		$attrs_values = $data['attribute_values'][$index]; // recupero todos los valores de marcas
+			// 	}
+
+			// }
+
+			// // Agrego o elimino modelos de acuerdo a la comparación de arrays de marcas
+			// $this->transient_add_attributes( $product_id, $product_meta, $attrs_values );
+
+			// // actualizo los valores de las marcas actuales
+			// update_post_meta( $product_id, POST_META_MARCA, $attrs_values );
+
+
+
+//=== Grabado de autocompletado campo modelo en base a marca en el detalle de producto ===
+	// =========================================================================================
+
+	// // Grabado al final de todo grabado del producto
+	// public function illantas_update_post_meta( $meta_id, $post_id, $meta_key, $meta_value ){
+
+	// 	if( $meta_key == '_edit_lock' ) {
+
+	// 		$nombre_transient = TRANSIENT_MARCAS_GRABAR . '|' . $post_id;
+	// 		$modelos = get_transient( $nombre_transient );
+
+
+	// 		if ( ! $modelos ) return; // validación
+
+	// 		$modelos_anteriores =  wp_get_object_terms( $post_id, TAX_MODELO );
+
+	// 		foreach ($modelos_anteriores as $item) {
+	// 			$modelos[] = $item->term_id;
+	// 		}
+
+	// 		$rel = new Illantas_Woo_Relations();
+	// 		$rel->save_post_meta_attributes( $post_id, $modelos ); //grabar en el post_meta
+
+	// 		//delete_transient( $nombre_transient ); // Eliminamos transient
+    // 	}
+
+    // }
+
+
+	// // Save product attributes
+	// public function illantas_save_attributes(){
+
+	// 	if ( isset ( $_POST['post_id'] ) ){
+
+    // 		$product_id = absint($_POST['post_id']);
+	// 		parse_str($_POST['data'], $data);
+
+	// 		$product_meta = get_post_meta( $product_id, POST_META_MARCA, true ); // recupero los valores guardados anteriormente
+	// 		$attrs_names = $data['attribute_names']; // para comprobar si tiene atributo marca
+	// 		$attrs_values = array(); // para recuperar los valores de marcas que tiene
+
+	// 		if ( in_array( TAX_MARCA , $attrs_names ) ){
+
+	// 			//consistencia en caso elimine el atributo y luego lo agregue, siempre recupera el último
+	// 			$keys_marcas = array_keys( $attrs_names , TAX_MARCA );
+	// 			$index = end( $keys_marcas );
+
+	// 			//verificar si existen valores de marcas
+	// 			if ( isset( $data['attribute_values'] ) && array_key_exists( $index, $data['attribute_values'] ) ) {
+	// 				$attrs_values = $data['attribute_values'][$index]; // recupero todos los valores de marcas
+	// 			}
+
+	// 		}
+
+	// 		// Agrego o elimino modelos de acuerdo a la comparación de arrays de marcas
+	// 		$this->transient_add_attributes( $product_id, $product_meta, $attrs_values );
+
+	// 		// actualizo los valores de las marcas actuales
+	// 		update_post_meta( $product_id, POST_META_MARCA, $attrs_values );
+	// 	}
+
+	// }
+
+	// // Almacenamiento temporal de los modelos de las marcas agregadas
+	// private function transient_add_attributes( $product_id, $arr_before, $arr_after ){
+
+	// 	if ( ! $product_id ) return;
+
+	// 	$rel = new Illantas_Woo_Relations();
+	// 	$modelos = Array();
+
+	// 	foreach ( $arr_after as $item ){ //Agregar modelos
+	// 		if ( ! in_array( $item, $arr_before ) ){
+	// 			$modelos = array_merge( $modelos, $rel->get_modelos_marca( $item ) ); // un array continuo de elementos modelos
+	// 		}
+	// 	}
+
+	// 	$transient_name = TRANSIENT_MARCAS_GRABAR . '|' . $product_id;
+	// 	set_transient( $transient_name, $modelos, MINUTE_IN_SECONDS*5 );
+
+	// }
+
+
+
+
+
+
+
+
+
+
 
 
 
