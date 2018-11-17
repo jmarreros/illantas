@@ -31,11 +31,6 @@ class Illantas_Woo_Relations {
 	}
 
 
-
-
-
-
-
 	// ---- Anteriores ---
 
 	// Recupera todos los modelos de una marca pasandole el id
@@ -75,6 +70,23 @@ class Illantas_Woo_Relations {
 	}
 
 
+	// Obtiene todos los modelos relacionados con su anclaje al que pertenece
+	// en formato de array multidimensional con el key inicial como anclaje
+	// $modelo_anclaje[anclaje][]=modelo
+	public function get_all_modelos_anclaje(){
+		$terms_modelo = $this->get_modelos();
+		$modelo_anclaje = array();
+
+		foreach($terms_modelo as $item){
+			$anclaje =  (int)get_term_meta( $item->term_id, TERM_META_ANCLAJE, true );
+			if ( $anclaje ){
+				$modelo_anclaje[$anclaje][] = $item->term_id;
+			}
+		}
+
+		return $modelo_anclaje;
+	}
+
 
 	// Obtiene todos los modelos relacionados con su marca a la que pertenece
 	// en formato de array multidimensional con el key inicial como marca
@@ -93,6 +105,8 @@ class Illantas_Woo_Relations {
 
 		return $modelo_marca;
 	}
+
+
 
 	// Grabar datos en atributos de WooCommerce también en el post_meta
 	public function save_post_meta_attributes($post_id, $modelos){
@@ -116,40 +130,41 @@ class Illantas_Woo_Relations {
 
 		// -- Grabar Anclajes
 
-		// // Obtenemos todos los anclajes de los modelos
-		// $anclajes = $this->get_anclas_modelos( $modelos );
-		// if ( ! empty($anclajes) ){
-		// 	wp_set_object_terms( $post_id, $anclajes, TAX_ANCLAJE ); // agregamos los atributos de modelos anclajes
-		// 	$meta_data_post[TAX_ANCLAJE] = [ 'name'=> TAX_ANCLAJE,
-		// 									'value'=> $anclajes,
-		// 									'is_visible' => '1',
-		// 									'position' => '2',
-		// 									'is_variation' => '0',
-		// 									'is_taxonomy' => '1' ];
-		// }
-		// // -- Fin Grabar Anclaje
+		// Obtenemos todos las marcas de los modelos
+		$marcas = $this->get_marcas_modelos( $modelos );
+
+		if ( ! empty($marcas) ){
+			wp_set_object_terms( $post_id, $marcas, TAX_MARCA ); // agregamos los atributos de modelos anclajes
+			$meta_data_post[TAX_MARCA] = [ 'name'=> TAX_MARCA,
+											'value'=> $marcas,
+											'is_visible' => '1',
+											'position' => '3',
+											'is_variation' => '0',
+											'is_taxonomy' => '1' ];
+		}
+		// -- Fin Grabar Anclaje
 
 		update_post_meta( $post_id, '_product_attributes', $meta_data_post );
 		update_post_meta( $post_id, PRODUCT_EXIST, true );
 	}
 
 
-	// Por cada modelo añadido agregamos su anclaje correspondiente
-	private function get_anclas_modelos( $modelos){
-
-		$anclajes = array();
+	// Función que por cada modelo añadido agregamos su marca correspondiente
+	private function get_marcas_modelos( $modelos ){
+		$marcas = array();
 		foreach($modelos as $modelo){
-			 $val =  (int)get_term_meta( $modelo, TERM_META_ANCLAJE, true );
-			 if ( $val ) $anclajes[] = $val;
+			$val = (int)get_term_meta( $modelo, TERM_META_MARCA, true );
+			if ($val) $marcas[] = $val;
 		}
-
-		return $anclajes;
+		return $marcas;
 	}
 
-	// Regulariza los modelos de las marcas para nuevos productos
-	public function regularizacion_marcas_modelos(){
 
-		$modelos_marca = $this->get_all_modelos_marca();  //para una marca específi a $modelos_marca[marca] retorna un array() de modelos
+	// Regulariza los modelos y marcas de los anclajes para nuevos productos
+	public function regularizacion_modelos_marcas(){
+
+		//para una marca específi a $modelos_marca[marca] retorna un array() de modelos
+		$modelos_anclaje = $this->get_all_modelos_anclaje();
 
 		// Obtenemos todos los productos, solo me interesa el id del producto
 		$args     = [
@@ -170,16 +185,16 @@ class Illantas_Woo_Relations {
 			}
 
 			//recupero todas las marcas por producto
-			$term_marcas_producto = get_the_terms($id_product, TAX_MARCA);
+			$term_anclaje_producto = get_the_terms($id_product, TAX_ANCLAJE);
 
 			// Inicializa el array de modelos y limpia el atributo, para poner la función como append = true
 			$modelos = array();
 			wp_set_object_terms( $id_product, $modelos, TAX_MODELO );
 
-			// Obtengo todos los modelos de todas las marcas para el producto
-			foreach($term_marcas_producto as $item){
-				if ( array_key_exists( $item->term_id, $modelos_marca ) ){
-					$modelos = array_merge( $modelos, $modelos_marca[$item->term_id]);
+			// Obtengo todos los modelos de todas los anclajes para el producto
+			foreach($term_anclaje_producto as $item){
+				if ( array_key_exists( $item->term_id, $modelos_anclaje ) ){
+					$modelos = array_merge( $modelos, $modelos_anclaje[$item->term_id]);
 				}
 			}
 
@@ -196,3 +211,19 @@ class Illantas_Woo_Relations {
 
 
 } // class
+
+
+
+
+
+	// // Por cada modelo añadido agregamos su anclaje correspondiente
+	// private function get_anclas_modelos( $modelos){
+
+	// 	$anclajes = array();
+	// 	foreach($modelos as $modelo){
+	// 		 $val =  (int)get_term_meta( $modelo, TERM_META_ANCLAJE, true );
+	// 		 if ( $val ) $anclajes[] = $val;
+	// 	}
+
+	// 	return $anclajes;
+	// }

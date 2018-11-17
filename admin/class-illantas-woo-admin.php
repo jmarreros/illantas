@@ -87,7 +87,7 @@ class Illantas_Woo_Admin {
 	// Regulariza las marcas / modelos para nuevos productos
 	public function illantas_regulariza_ajax(){
 		$rel = new Illantas_Woo_Relations();
-		$rel->regularizacion_marcas_modelos();
+		$rel->regularizacion_modelos_marcas();
 		wp_die();
 	}
 
