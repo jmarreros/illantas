@@ -81,6 +81,7 @@ class Illantas_Woo_Admin {
 
 	// Muestra la opción de menú de regularización marca modelo
 	public function illantas_admin_regulariza_modelos(){
+			$rel = new Illantas_Woo_Relations();
 			include_once ILLANTAS_DIR . 'admin/partials/illantas-woo-regulariza-display.php';
 	}
 

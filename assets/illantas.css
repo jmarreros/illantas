@@ -1,3 +1,7 @@
 #product_attributes .save_attributes{
     display: none;
 }
+
+.container-inline{
+    display: inline-block;
+}
