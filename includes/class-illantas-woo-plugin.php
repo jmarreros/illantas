@@ -158,8 +158,8 @@ class Illantas_Woo {
 
 		// Regulariza las marcas/modelos manualmente
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'illantas_admin_menu', 99 );
-		$this->loader->add_action( 'wp_ajax_illantas_regulariza', $plugin_admin, 'illantas_regulariza_ajax' );
-
+		$this->loader->add_action( 'wp_ajax_illantas_regulariza_nuevos', $plugin_admin, 'illantas_regulariza_nuevos_ajax' );
+		$this->loader->add_action( 'wp_ajax_illantas_regulariza_existentes', $plugin_admin, 'illantas_regulariza_existentes_ajax' );
 
 		// Agrega campo marca en taxonomia modelo
 		$this->loader->add_action( TAX_MODELO.'_edit_form_fields', $plugin_admin, 'add_marcas_field', 10, 2);

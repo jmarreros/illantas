@@ -159,20 +159,23 @@ class Illantas_Woo_Relations {
 		return $marcas;
 	}
 
+	// Get all products
+	private function get_products(){
+		$args     = [
+			'post_type' => 'product',
+			'posts_per_page' => -1
+			];
+		return get_posts( $args );
+	}
 
 	// Regulariza los modelos y marcas de los anclajes para nuevos productos
-	public function regularizacion_modelos_marcas(){
+	public function regularizacion_productos_nuevos(){
 
 		//para una marca específi a $modelos_marca[marca] retorna un array() de modelos
 		$modelos_anclaje = $this->get_all_modelos_anclaje();
 
 		// Obtenemos todos los productos, solo me interesa el id del producto
-		$args     = [
-					'post_type' => 'product',
-					'posts_per_page' => -1
-					];
-		$products = get_posts( $args );
-
+		$products = $this->get_products();
 
 		//Recorremos todos los productos obtenidos
 		foreach ( $products as $product ){
@@ -199,7 +202,7 @@ class Illantas_Woo_Relations {
 			}
 
 			//Actualizo el atributo de modelos
-			wp_set_object_terms( $id_product, $modelos, TAX_MODELO);
+			//wp_set_object_terms( $id_product, $modelos, TAX_MODELO);
 
 			$this->save_post_meta_attributes( $id_product, $modelos ); //grabar en el post_meta
 
@@ -207,6 +210,40 @@ class Illantas_Woo_Relations {
 			update_post_meta( $id_product, PRODUCT_EXIST, true );
 		}
 
+	}
+
+
+	// Regulariza los modelos y marcas de los anclajes para nuevos productos
+	public function regularizacion_productos_existentes(){
+
+		$id_anclaje = intval($_REQUEST['id_anclaje']);
+		$id_modelo = intval($_REQUEST['id_modelo']);
+
+		// validación de valores y consistencia en relación
+		if ( ! $id_modelo  || $id_anclaje != get_term_meta( $id_modelo, TERM_META_ANCLAJE, true ) ) return false;
+
+
+		$products = $this->get_products();
+
+		//Recorremos todos los productos obtenidos
+		foreach ( $products as $product ){
+			$modelos = array();
+			$id_product = $product->ID;
+			$term_anclaje_producto = get_the_terms($id_product, TAX_ANCLAJE);
+
+			foreach($term_anclaje_producto as $item){
+				// Si el producto tiene un anclaje igual a id_anclaje
+				if ( $item->term_id == $id_anclaje  ) {
+					$modelos[] = $id_modelo;
+					// TODO ESTOY SOBREESCRIBIENDO EL MODELO Y LOS ANTERIORES SE PIERDEN
+					$this->save_post_meta_attributes( $id_product, $modelos );
+					break;
+				}
+			}// term_anclaje_producto
+
+		}// product
+
+		return true;
 	}
 
 

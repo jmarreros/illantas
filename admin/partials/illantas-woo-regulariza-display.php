@@ -30,7 +30,7 @@ $anclajes = $rel->get_anclajes();
 </style>
 
 <h3>Regulariza productos existentes</h3>
-<p>Regulariza todos los productos <strong>que tengan el anclaje</strong> al que pertenece ese modelo seleccionado. Se agregará el modelo y marca(si aplica)</p>
+<p>Regulariza todos los productos <strong>que tengan el anclaje</strong> al que pertenece ese <strong>modelo seleccionado</strong>. Se agregará el modelo y marca(si aplica)</p>
 <?php if ( ! empty($modelos) ): ?>
 <form id="frm-regulariza-existentes" method="post">
     <div class="submit">
@@ -96,17 +96,55 @@ $('#frm-regulariza-existentes #modelos').on('change',function(){
     $('#anclaje-name span').text(obj_anclajes[id_anclaje]?obj_anclajes[id_anclaje]:'');
 });
 
+// On submit productos existentes
+$('#frm-regulariza-existentes').on('submit', function(e){
+    e.preventDefault();
+
+    // Validate
+    if ( $('#anclaje-name span').text() == '' ){
+        alert('El modelo no tiene anclaje, asigna un anclaje antes ✋');
+        return false;
+    }
+
+    $.ajax({
+        url: "<?php echo admin_url('admin-ajax.php') ?>",
+        type: 'post',
+        data:{
+            action:'illantas_regulariza_existentes',
+            id_modelo: $('#frm-regulariza-existentes #modelos').val(),
+            id_anclaje: $('#frm-regulariza-existentes #modelos').find(':selected').data("anclaje")
+        },
+        beforeSend:function(){
+            $('#submit-existentes').attr('disabled',true);
+            $('.processing-existentes').show();
+        },
+        error: function(){
+            $('.processing-existentes').html('<strong>Ocurrió algún error!!</strong>');
+        },
+        success: function (res){
+            if ( parseInt(res) <= 0 ){
+                $('.processing-existentes').html('<strong>Ocurrió algún error!!</strong>');
+            }
+            else{
+                $('.processing-existentes').html('<strong>El proceso culminó correctamente.</strong> <a href="' + window.location.href + '">Regulariza otro modelo</a>' );
+                $('#submit-existentes').hide();
+                // console.log(res);
+            }
+        }
+
+     });
+
+});
 
 // On submit nuevos productos
 $('#frm-regulariza-nuevos').on('submit', function(e){
      e.preventDefault();
-     console.log('Se hizo click');
 
      $.ajax({
         url: "<?php echo admin_url('admin-ajax.php') ?>",
         type: 'post',
         data:{
-            action:'illantas_regulariza'
+            action:'illantas_regulariza_nuevos'
         },
         beforeSend:function(){
             $('#submit-nuevos').attr('disabled',true);
@@ -116,13 +154,12 @@ $('#frm-regulariza-nuevos').on('submit', function(e){
             $('.processing-nuevos').html('<strong>Ocurrió algún error!!</strong>');
         },
         success: function (res){
-            if ( parseInt(res) <=0 ){
+            if ( parseInt(res) <= 0 ){
                 $('.processing-nuevos').html('<strong>Ocurrió algún error!!</strong>');
             }
             else{
                 $('.processing-nuevos').html('<strong>El proceso culminó correctamente</strong>');
                 $('#submit-nuevos').hide();
-                console.log(res);
             }
         }
 

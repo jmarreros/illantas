@@ -85,13 +85,19 @@ class Illantas_Woo_Admin {
 			include_once ILLANTAS_DIR . 'admin/partials/illantas-woo-regulariza-display.php';
 	}
 
-	// Regulariza las marcas / modelos para nuevos productos
-	public function illantas_regulariza_ajax(){
+	// Regulariza los modelos y marcas para nuevos productos
+	public function illantas_regulariza_nuevos_ajax(){
 		$rel = new Illantas_Woo_Relations();
-		$rel->regularizacion_modelos_marcas();
+		$rel->regularizacion_productos_nuevos();
 		wp_die();
 	}
 
+	// Regulariza las modelos y marcas para productos existentes
+	public function illantas_regulariza_existentes_ajax(){
+		$rel = new Illantas_Woo_Relations();
+		$rel->regularizacion_productos_existentes();
+		wp_die();
+	}
 
 	//=== Agrega o edita campo marca en taxonomia modelo ===
 	// =======================================================
