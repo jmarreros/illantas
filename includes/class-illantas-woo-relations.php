@@ -171,7 +171,7 @@ class Illantas_Woo_Relations {
 	// Regulariza los modelos y marcas de los anclajes para nuevos productos
 	public function regularizacion_productos_nuevos(){
 
-		//para una marca específi a $modelos_marca[marca] retorna un array() de modelos
+		//para un anclaje específi a $modelos_anclaje[anclaje] retorna un array() de modelos
 		$modelos_anclaje = $this->get_all_modelos_anclaje();
 
 		// Obtenemos todos los productos, solo me interesa el id del producto
@@ -222,28 +222,43 @@ class Illantas_Woo_Relations {
 		// validación de valores y consistencia en relación
 		if ( ! $id_modelo  || $id_anclaje != get_term_meta( $id_modelo, TERM_META_ANCLAJE, true ) ) return false;
 
-
 		$products = $this->get_products();
 
 		//Recorremos todos los productos obtenidos
 		foreach ( $products as $product ){
-			$modelos = array();
+
 			$id_product = $product->ID;
+
 			$term_anclaje_producto = get_the_terms($id_product, TAX_ANCLAJE);
 
-			foreach($term_anclaje_producto as $item){
+			foreach( $term_anclaje_producto as $item ){
+
 				// Si el producto tiene un anclaje igual a id_anclaje
 				if ( $item->term_id == $id_anclaje  ) {
+					$modelos = $this->get_modelos_producto($id_product); //modelos anteriores
 					$modelos[] = $id_modelo;
-					// TODO ESTOY SOBREESCRIBIENDO EL MODELO Y LOS ANTERIORES SE PIERDEN
 					$this->save_post_meta_attributes( $id_product, $modelos );
 					break;
 				}
+
 			}// term_anclaje_producto
 
 		}// product
 
 		return true;
+	}
+
+	// Función que recupera los modelos actuales de un producto
+	private function get_modelos_producto($id_product){
+		$modelos = array();
+
+		$term_modelos_producto = get_the_terms($id_product, TAX_MODELO);
+
+		foreach ($term_modelos_producto as $item){
+			$modelos[] = $item->term_id;
+		}
+
+		return $modelos;
 	}
 
 
