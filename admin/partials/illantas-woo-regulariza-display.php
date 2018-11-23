@@ -83,7 +83,11 @@ $modelos_meta_anclaje = json_encode($rel->get_modelos_meta_anclaje());
 
         <div class="container-inline">
             <div class="processing-existentes">
-                Procesando ... <img src="<?php echo ILLANTAS_URL.'/assets/loader.gif' ?>" />
+                <span class="procesando">
+                    Procesando ... <img src="<?php echo ILLANTAS_URL.'/assets/loader.gif' ?>" />
+                </span>
+                <span class="msg">
+                </span>
             </div>
         </div>
 
@@ -179,18 +183,22 @@ $('#frm-regulariza-existentes').on('submit', function(e){
             id_anclaje: obj_modelo_anclaje[$('#frm-regulariza-existentes #modelos').val()]
         },
         beforeSend:function(){
-            $('#submit-existentes').attr('disabled',true);
+            $('#submit-existentes').attr('disabled', true);
             $('.processing-existentes').show();
+            $('.processing-existentes .procesando').show();
         },
         error: function(){
-            $('.processing-existentes').html('<strong>Ocurrió algún error!!</strong>');
+            $('.processing-existentes .procesando').hide();
+            $('.processing-existentes .msg').html('<strong>Ocurrió algún error!!</strong>');
         },
         success: function (res){
+            $('.processing-existentes .procesando').hide();
+
             if ( parseInt(res) <= 0 ){
-                $('.processing-existentes').html('<strong>Ocurrió algún error!!</strong>');
+                $('.processing-existentes .msg').html('<strong>Ocurrió algún error!!</strong>');
             }
             else{
-                $('.processing-existentes').html('<strong>El proceso culminó correctamente.</strong> <a href="' + window.location.href + '">Regulariza otro modelo</a>' );
+                $('.processing-existentes .msg').html('<strong>El proceso culminó correctamente.</strong> <a id="link-refresh" href="#">Regulariza otro modelo</a>' );
                 $('#submit-existentes').hide();
             }
         }
@@ -198,6 +206,15 @@ $('#frm-regulariza-existentes').on('submit', function(e){
      });
 
 });
+
+// Refrescar
+$('.processing-existentes').on('click', '#link-refresh', function(e) {
+    e.preventDefault();
+    $('.processing-existentes .msg').text('');
+    $('#submit-existentes').attr('disabled', false);
+    $('#submit-existentes').show();
+});
+
 
 // On submit nuevos productos
 $('#frm-regulariza-nuevos').on('submit', function(e){
