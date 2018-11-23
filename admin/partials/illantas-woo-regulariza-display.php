@@ -3,12 +3,12 @@
 
 <?php
 
+$marcas = $rel->get_marcas();
 $modelos = $rel->get_modelos();
 $anclajes = $rel->get_anclajes();
 
-// print_r($anclajes);
-// print_r($modelos_anclaje);
-// print_r($modelos);
+$modelos_marca = json_encode($rel->get_all_modelos_marca());
+$modelos_meta_anclaje = json_encode($rel->get_modelos_meta_anclaje());
 ?>
 
 <style>
@@ -24,33 +24,69 @@ $anclajes = $rel->get_anclajes();
         display:inline-block;
         margin-top:-10px;
     }
-    #frm-regulariza-existentes .container-inline:last-child{
+
+    #frm-regulariza-existentes .container-inline{
         vertical-align:top;
+        margin-right:6px;
+    }
+
+    #anclaje-name{
+        display:inline-block;
+        vertical-align:top;
+        margin-top:6px;
+    }
+    #anclaje-name span{
+        vertical-align:top;
+        min-width:70px;
+        display:inline-block;
+        background:#ccc;
+        padding:2px 4px ;
+        min-height:20px;
+        border-radius:3px;
+        margin-top:-2px;
+    }
+    #marcas,
+    #modelos{
+        min-width:120px;
     }
 </style>
 
-<h3>Regulariza productos existentes</h3>
-<p>Regulariza todos los productos <strong>que tengan el anclaje</strong> al que pertenece ese <strong>modelo seleccionado</strong>. Se agregará el modelo y marca(si aplica)</p>
+<h3>Regulariza productos</h3>
+<p>Regulariza todos los productos <strong>que tengan el anclaje</strong> al que pertenece el <strong>modelo seleccionado</strong>. Se agregará el modelo y marca(si aplica)</p>
 <?php if ( ! empty($modelos) ): ?>
 <form id="frm-regulariza-existentes" method="post">
     <div class="submit">
+
+        <div class="container-inline">
+            <label>Filtrar:</label>
+            <select id="marcas" name="marcas">
+                <?php foreach( $marcas as $marca ): ?>
+                    <option value="<?= $marca->term_id; ?>"><?= $marca->name ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+
         <div class="container-inline">
             <label>Modelo:</label>
             <select id="modelos" name="modelos">
-                <?php foreach( $modelos as $modelo ): ?>
-                    <?php $anclaje = get_term_meta( $modelo->term_id, TERM_META_ANCLAJE, true ); ?>
-                    <option data-anclaje="<?= $anclaje ?>" value="<?= $modelo->term_id ?>" ><?= $modelo->name ?></option>
-                <?php endforeach; ?>
             </select>
+
+        </div>
+
+        <div class="container-inline">
             <div id="anclaje-name">Anclaje: <span></span></div>
         </div>
 
         <div class="container-inline">
             <input name="submit" id="submit-existentes" class="button button-primary" value="Regularizar" type="submit" >
-            <span class="processing-existentes">
-                Procesando ... <img src="<?php echo ILLANTAS_URL.'/assets/loader.gif' ?>" />
-            </span>
         </div>
+
+        <div class="container-inline">
+            <div class="processing-existentes">
+                Procesando ... <img src="<?php echo ILLANTAS_URL.'/assets/loader.gif' ?>" />
+            </div>
+        </div>
+
     </div>
 </form>
 <?php else: ?>
@@ -74,13 +110,22 @@ $anclajes = $rel->get_anclajes();
 <script>
 
 <?php
-// Grabar anclajes en variable javascript
+// Simplificamos objetos de modelos y anclajes
+
+$arr_modelo = array();
+foreach ($modelos as $modelo){
+    $arr_modelo[$modelo->term_id] = $modelo->name;
+};
+
 $arr_anclaje = array();
 foreach ($anclajes as $anclaje){
     $arr_anclaje[$anclaje->term_id] = $anclaje->name;
 };
 
+echo "var obj_modelos = JSON.parse('" . json_encode($arr_modelo) . "');";
 echo "var obj_anclajes = JSON.parse('" . json_encode($arr_anclaje) . "');";
+echo "var obj_marcas_modelo = JSON.parse('" . $modelos_marca . "');";
+echo "var obj_modelo_anclaje = JSON.parse('". $modelos_meta_anclaje ."');";
 ?>
 
 (function($){
@@ -89,10 +134,29 @@ echo "var obj_anclajes = JSON.parse('" . json_encode($arr_anclaje) . "');";
 $('.processing-nuevos').hide();
 $('.processing-existentes').hide();
 
+
+// Change select marcas
+$('#frm-regulariza-existentes #marcas').on('change',function(){
+    var id_marca = $(this).val();
+    var modelos = obj_marcas_modelo[id_marca];
+
+    $('#frm-regulariza-existentes #modelos').empty();
+    if ( modelos ){
+        modelos.forEach(function(item) {
+            $('#frm-regulariza-existentes #modelos').append($('<option>', {
+                value: item,
+                text : obj_modelos[item]
+            }));
+        });
+    }
+    $('#frm-regulariza-existentes #modelos').trigger('change');
+});
+
 // Change select modelos
-var id_anclaje;
 $('#frm-regulariza-existentes #modelos').on('change',function(){
-    id_anclaje = $(this).find(':selected').data("anclaje");
+    var id_modelo = $(this).val();
+    var id_anclaje = obj_modelo_anclaje[id_modelo];
+
     $('#anclaje-name span').text(obj_anclajes[id_anclaje]?obj_anclajes[id_anclaje]:'');
 });
 
@@ -112,7 +176,7 @@ $('#frm-regulariza-existentes').on('submit', function(e){
         data:{
             action:'illantas_regulariza_existentes',
             id_modelo: $('#frm-regulariza-existentes #modelos').val(),
-            id_anclaje: $('#frm-regulariza-existentes #modelos').find(':selected').data("anclaje")
+            id_anclaje: obj_modelo_anclaje[$('#frm-regulariza-existentes #modelos').val()]
         },
         beforeSend:function(){
             $('#submit-existentes').attr('disabled',true);
@@ -128,7 +192,6 @@ $('#frm-regulariza-existentes').on('submit', function(e){
             else{
                 $('.processing-existentes').html('<strong>El proceso culminó correctamente.</strong> <a href="' + window.location.href + '">Regulariza otro modelo</a>' );
                 $('#submit-existentes').hide();
-                // console.log(res);
             }
         }
 
@@ -167,7 +230,7 @@ $('#frm-regulariza-nuevos').on('submit', function(e){
 
 });
 
-$('#frm-regulariza-existentes #modelos').trigger('change');
+$('#frm-regulariza-existentes #marcas').trigger('change');
 
 
 })(jQuery);

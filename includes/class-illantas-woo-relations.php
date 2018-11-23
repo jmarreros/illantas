@@ -87,6 +87,21 @@ class Illantas_Woo_Relations {
 		return $modelo_anclaje;
 	}
 
+	// Obtiene un array de modelos relacionados con el anclaje que tiene
+	public function get_modelos_meta_anclaje(){
+		$modelos = $this->get_modelos();
+		$modelos_meta_anclaje = array();
+
+		foreach($modelos as $modelo){
+			$anclaje =  (int)get_term_meta( $modelo->term_id, TERM_META_ANCLAJE, true );
+			if ( $anclaje ){
+				$modelos_meta_anclaje[$modelo->term_id] = $anclaje;
+			}
+		}
+
+		return $modelos_meta_anclaje;
+	}
+
 
 	// Obtiene todos los modelos relacionados con su marca a la que pertenece
 	// en formato de array multidimensional con el key inicial como marca
@@ -216,8 +231,8 @@ class Illantas_Woo_Relations {
 	// Regulariza los modelos y marcas de los anclajes para nuevos productos
 	public function regularizacion_productos_existentes(){
 
-		$id_anclaje = intval($_REQUEST['id_anclaje']);
 		$id_modelo = intval($_REQUEST['id_modelo']);
+		$id_anclaje = intval($_REQUEST['id_anclaje']);
 
 		// validación de valores y consistencia en relación
 		if ( ! $id_modelo  || $id_anclaje != get_term_meta( $id_modelo, TERM_META_ANCLAJE, true ) ) return false;
