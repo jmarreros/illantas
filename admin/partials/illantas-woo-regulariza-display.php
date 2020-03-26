@@ -139,6 +139,7 @@ $('.processing-nuevos').hide();
 $('.processing-existentes').hide();
 
 
+// --> Productos existentes
 // Change select marcas
 $('#frm-regulariza-existentes #marcas').on('change',function(){
     var id_marca = $(this).val();
@@ -216,7 +217,7 @@ $('.processing-existentes').on('click', '#link-refresh', function(e) {
 });
 
 
-// On submit nuevos productos
+// --> On submit nuevos productos
 $('#frm-regulariza-nuevos').on('submit', function(e){
      e.preventDefault();
 

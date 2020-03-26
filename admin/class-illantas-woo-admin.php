@@ -166,6 +166,7 @@ class Illantas_Woo_Admin {
 			update_post_meta( $product_id, POST_META_ANCLAJE, $attr_current );
 		}
 
+        wp_send_json_success( true );
 		wp_die();
 	}
 

@@ -183,24 +183,31 @@ class Illantas_Woo_Relations {
 		return get_posts( $args );
 	}
 
+	// Obtenemos los nuevos ids de productos nuevos, basándonos en su valor de metadata PRODUCT_EXIST
+	private function get_new_products(){
+		global $wpdb;
+
+		$table_posts = $wpdb->prefix.'posts';
+		$table_meta = $wpdb->prefix.'postmeta';
+
+		$sql = $wpdb->prepare("SELECT id FROM {$table_posts} WHERE post_type='product' AND id not in (
+			SELECT post_id FROM {$table_meta} WHERE meta_key='%s' AND meta_value='1')", PRODUCT_EXIST);
+
+		$values = $wpdb->get_col( $sql );
+
+		return $values;
+	}
+
 	// Regulariza los modelos y marcas de los anclajes para nuevos productos
 	public function regularizacion_productos_nuevos(){
 
 		//para un anclaje específi a $modelos_anclaje[anclaje] retorna un array() de modelos
 		$modelos_anclaje = $this->get_all_modelos_anclaje();
 
-		// Obtenemos todos los productos, solo me interesa el id del producto
-		$products = $this->get_products();
+		$id_products = $this->get_new_products();
 
 		//Recorremos todos los productos obtenidos
-		foreach ( $products as $product ){
-
-			$id_product = $product->ID;
-
-			//Validamos para saber si es un nuevo producto
-			if ( get_post_meta( $id_product, PRODUCT_EXIST, true) ) {
-				continue;
-			}
+		foreach ( $id_products as $id_product ){
 
 			//recupero todas las marcas por producto
 			$term_anclaje_producto = get_the_terms($id_product, TAX_ANCLAJE);
