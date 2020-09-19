@@ -251,12 +251,5 @@ class Illantas_Woo {
 } // class
 
 
-// $this->loader->add_action( 'save_post_product', $plugin_admin, 'illantas_save_product', 1000, 3);
-
-// $this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
-// $this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
-// $this->loader->add_action( 'admin_menu', $plugin_admin, 'illantas_admin_menu', 99);
-
-// $this->loader->add_action( 'save_post_product', $plugin_admin, 'illantas_save_product', 100, 3);
 
 

@@ -161,6 +161,9 @@ class Illantas_Woo_Relations {
 
 		update_post_meta( $post_id, '_product_attributes', $meta_data_post );
 		update_post_meta( $post_id, PRODUCT_EXIST, true );
+
+		// Nos aseguramos de que tenga tipo de producto simple
+		wp_set_object_terms($post_id, 2, 'product_type');
 	}
 
 
