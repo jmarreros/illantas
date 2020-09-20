@@ -54,6 +54,28 @@ class Illantas_Woo_Public {
 
 	} // __construct()
 
+
+	// Creación del shortcode
+	public function illantas_shortcodes(){
+		add_shortcode(SHORTCODE_NAME, array($this,'generar_filtro_illantas'));
+	}
+
+	public function generar_filtro_illantas( $atts , $content ){
+		$atts 		= shortcode_atts(['marca' => 'todos'], $atts, SHORTCODE_NAME );
+		$marca 	= $atts['marca'];
+		include_once 'partials/illantas-woo-shortcode-display.php';
+	}
+
+
+	// Asignación de parámetros en la url
+	public function illantas_shortcodes_query_args($query_vars){
+		$query_vars[] = 'anclaje';
+		$query_vars[] = 'diametro';
+		return $query_vars;
+	}
+
+
+
 	/**
 	 * Register the stylesheets for the public-facing side of the site.
 	 *

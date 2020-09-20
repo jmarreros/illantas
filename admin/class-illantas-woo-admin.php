@@ -204,6 +204,7 @@ class Illantas_Woo_Admin {
 				$modelos = array_merge( $modelos, $rel->get_modelos_anclaje( $item ) ); // un array continuo de elementos modelos
 			}
 		}
+		error_log(print_r($modelos, true));
 
 		$transient_name = TRANSIENT_ANCLAJES_GRABAR . '|' . $product_id;
 		set_transient( $transient_name, $modelos, MINUTE_IN_SECONDS*5 );

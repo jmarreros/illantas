@@ -46,6 +46,11 @@ define( 'TRANSIENT_ANCLAJES_GRABAR', 'illantas_anclajes_grabar');
 
 define( 'PRODUCT_EXIST', '_producto_existente' );
 
+//Shortcode
+
+define( 'SHORTCODE_NAME', 'filtroIllantas' );
+
+
 //===============
 
 

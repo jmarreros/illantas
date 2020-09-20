@@ -184,9 +184,12 @@ class Illantas_Woo {
 
 	} // define_admin_hooks()
 
+
+
+
 	/**
 	 * Register all of the hooks related to the public-facing functionality
-	 * of the plugin.
+	 * of the plugin. Para los shortcodes
 	 *
 	 * @since 		1.0.0
 	 * @access 		private
@@ -197,8 +200,14 @@ class Illantas_Woo {
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+		$this->loader->add_action( 'init', $plugin_public, 'illantas_shortcodes' );
+		$this->loader->add_filter( 'query_vars', $plugin_public, 'illantas_shortcodes_query_args', 1, 10 );
 
 	} // define_public_hooks()
+
+
+
+
 
 	/**
 	 * Run the loader to execute all of the hooks with WordPress.
