@@ -1,21 +1,32 @@
 <?php
 
-if( ! function_exists('wc_get_products')) {
+  if( ! function_exists('wc_get_products')) {
     return;
   }
 
-  // Parámetros de filtro
-  $anclaje = get_query_var('anclaje', 'todos');
-  $diametro = get_query_var('diametro', 'todos');
+
+  // Construimos los la consulta de las taxonomias para filtra atributos
+  // en la consulta principal en base a los argumentos de la url
+  $tax_query = array();
+  $attrs = wc_get_attribute_taxonomies();
+  $attrs = wp_list_pluck($attrs, 'attribute_name');
+
+  foreach ($attrs as $attr) {
+    $attr = 'pa_'.$attr;
+    if ( ! get_query_var($attr) ) continue;
+
+    $tax_query[] = [
+      'taxonomy'  => $attr,
+      'field'     => 'slug',
+      'terms'     => get_query_var($attr)
+    ];
+  }
 
   $paged                   = (get_query_var('paged')) ? absint(get_query_var('paged')) : 1;
   $ordering                = WC()->query->get_catalog_ordering_args();
   $ordering['orderby']     = array_shift(explode(' ', $ordering['orderby']));
   $ordering['orderby']     = stristr($ordering['orderby'], 'price') ? 'meta_value_num' : $ordering['orderby'];
   $products_per_page       = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
-
-
-
 
   $sel_products       = wc_get_products(array(
     'status'               => 'publish',
@@ -27,30 +38,14 @@ if( ! function_exists('wc_get_products')) {
     'order'                => $ordering['order'],
     'tax_query'            => array(
       'relation' => 'AND',
-      // [
-      //   'taxonomy'  => 'pa_marca',
-      //   'field'     => 'slug',
-      //   'terms'     => 'ford'
-      // ],
-      [
-        'taxonomy'  => 'pa_anclaje',
-        'field'     => 'slug',
-        'terms'     => '5x100'
-      ],
-      [
-        'taxonomy'  => 'pa_diametro',
-        'field'     => 'slug',
-        'terms'     => '17-0'
-      ],
+      $tax_query
     ),
   ));
 
+  // Mostrar Filtros
+  require_once 'illantas-woo-filters-display.php';
 
-    // Mostrar Filtros
-    require_once 'illantas-woo-filters-display.php';
-
-echo "<hr>";
-    // echo "Anclaje:" . $anclaje . " Diametro:" .$diametro;
+  echo "<hr>";
   echo "Total productos: ". $sel_products->total;
 
   wc_set_loop_prop('current_page', $paged);
@@ -60,15 +55,6 @@ echo "<hr>";
   wc_set_loop_prop('total', $sel_products->total);
   wc_set_loop_prop('total_pages', $sel_products->max_num_pages);
 
-
-
-  // Probamos
-
-
-  $tax_query  = WC_Query::get_main_tax_query();
-  $meta_query = WC_Query::get_main_meta_query();
-
-  error_log(print_r($tax_query->sql, true));
 
   if($sel_products) {
 
@@ -91,53 +77,20 @@ echo "<hr>";
 echo ob_get_clean();
 
 
-// Todo Revisar función
-function get_filtered_term_product_counts( $term_ids, $taxonomy, $query_type ) {
-  global $wpdb;
-
-  $tax_query  = WC_Query::get_main_tax_query();
-  $meta_query = WC_Query::get_main_meta_query();
-
-  if ( 'or' === $query_type ) {
-    foreach ( $tax_query as $key => $query ) {
-      if ( is_array( $query ) && $taxonomy === $query['taxonomy'] ) {
-        unset( $tax_query[ $key ] );
-      }
-    }
-  }
-
-  $meta_query     = new WP_Meta_Query( $meta_query );
-  $tax_query      = new WP_Tax_Query( $tax_query );
-  $meta_query_sql = $meta_query->get_sql( 'post', $wpdb->posts, 'ID' );
-  $tax_query_sql  = $tax_query->get_sql( $wpdb->posts, 'ID' );
-
-  // Generate query
-  $query           = array();
-  $query['select'] = "SELECT COUNT( DISTINCT {$wpdb->posts}.ID ) as term_count, terms.term_id as term_count_id";
-  $query['from']   = "FROM {$wpdb->posts}";
-  $query['join']   = "
-  INNER JOIN {$wpdb->term_relationships} AS term_relationships ON {$wpdb->posts}.ID = term_relationships.object_id
-  INNER JOIN {$wpdb->term_taxonomy} AS term_taxonomy USING( term_taxonomy_id )
-  INNER JOIN {$wpdb->terms} AS terms USING( term_id )
-  " . $tax_query_sql['join'] . $meta_query_sql['join'];
-
-  $query['where'] = "
-  WHERE {$wpdb->posts}.post_type IN ( 'product' )
-  AND {$wpdb->posts}.post_status = 'publish'
-  " . $tax_query_sql['where'] . $meta_query_sql['where'] . "
-  AND terms.term_id IN (" . implode( ',', array_map( 'absint', $term_ids ) ) . ")
-";
-
-  if ( $search = WC_Query::get_main_search_query_sql() ) {
-    $query['where'] .= ' AND ' . $search;
-  }
-
-  $query['group_by'] = "GROUP BY terms.term_id";
-  $query             = apply_filters( 'woocommerce_get_filtered_term_product_counts_query', $query );
-  $query             = implode( ' ', $query );
-  $results           = $wpdb->get_results( $query );
-
-  error_log(print_r($results,true));
-
-  return wp_list_pluck( $results, 'term_count', 'term_count_id' );
-}
+// tax_query exmample
+// ===================
+// [
+//   'taxonomy'  => 'pa_marca',
+//   'field'     => 'slug',
+//   'terms'     => 'ford'
+// ],
+// [
+//   'taxonomy'  => 'pa_anclaje',
+//   'field'     => 'slug',
+//   'terms'     => '5x100'
+// ],
+// [
+//   'taxonomy'  => 'pa_diametro',
+//   'field'     => 'slug',
+//   'terms'     => '17-0'
+// ],

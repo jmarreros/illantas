@@ -12,29 +12,43 @@
  */
 class Illantas_Woo_Filters {
 
-    private $data;
-    private $attributes;
+    private $data; // Almacena toda la data de todos los filtros
+    private $attributes; // Almacena los atributos que se pasan como parámetros
 
-    public function __construct($attributes = ['5x100', '18-0']){
+
+    // Inicialización
+    public function __construct( $attributes ){
         $this->attributes = $attributes;
         $this->data = $this->get_data_attributes();
     }
 
-    public function create_select_marcas(){
-        $data = [
-            'ford' => 'Ford',
-            'honda' => 'Honda',
-            'audi' => 'Audi',
-        ];
 
-        // return $this->create_select_generic('dropdown_nav_marca', 'marca', $data, 0);
-        return $this->data;
+    // Obtiene datos y crea lista de acuerdo a la taxonomia
+    public function create_generic_select($tax){
+        $list = array();
+
+        // Filtramos los datos de sólo una taxonomía específica
+        $list = array_filter( $this->data, function( $item ) use($tax){
+            return $item['taxonomy'] == 'pa_'.$tax;
+        });
+
+        // Extraemos sólo el nombre y slug
+        $list = wp_list_pluck($list, 'name', 'slug');
+
+        return $this->create_HTML_select('dropdown_'.$tax, $tax, $list, '');
     }
 
-    // Crea un lista genérica
-    private function create_select_generic($class, $url, $data, $selected){
+
+    // Crea un lista HTML genérica
+    private function create_HTML_select($class, $url, $data, $selected){
+        if ( ! count($data) ) return false;
+
         $out = '<select class="'.esc_attr($class).'"';
         $out .= ' data-filter-url="'.esc_attr ($url).'">';
+
+        $out .= '<option value=""';
+        $out .= ( ! $selected ) ? ' selected ':'';
+        $out .= '>Todos</option>';
 
         foreach ($data as $key => $value) {
             $out .= '<option value="'.$key.'">'.$value.'</option>';
@@ -79,7 +93,7 @@ class Illantas_Woo_Filters {
                     GROUP BY t.name, t.slug, tt.taxonomy
                     ORDER BY tt.taxonomy, t.name";
 
-        $results = $wpdb->get_results( $query );
+        $results = $wpdb->get_results( $query , ARRAY_A);
 
         return $results;
 
