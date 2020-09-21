@@ -32,8 +32,9 @@
 			let urlParams = new Object;
 
 			$('.idropdown').each(function(){
- 				// excluimos el filtro principal
-				if ( $(this).data('filter-url') == marcaTax ) return;
+ 				// excluimos el filtro de marca y de fabricante
+				if ( $(this).data('filter-url') == marcaTax || 
+					$(this).data('filter-url') == fabricanteTax) return;
 
 				// Si es diferente de todos
 				if ( $(this).val() ){

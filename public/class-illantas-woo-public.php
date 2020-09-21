@@ -94,19 +94,3 @@ class Illantas_Woo_Public {
 	} // enqueue_scripts()
 
 } // class
-
-
-	// Asignación de parámetros en la url
-	// public function illantas_shortcodes_query_args($query_vars){
-	// 	$attrs = wc_get_attribute_taxonomies();
-	// 	$vars = wp_list_pluck($attrs, 'attribute_name');
-
-	// 	if ( ! get_query_var($vars[0]) ){
-	// 		foreach ($vars as $var) {
-	// 			$query_vars[] = $var;
-	// 		}
-	// 	}
-
-	// 	error_log(print_r($query_vars,true));
-	// 	return $query_vars;
-	// }

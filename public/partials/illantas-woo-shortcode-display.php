@@ -1,116 +1,21 @@
 <?php
 
-  if( ! function_exists('wc_get_products')) {
-    return;
-  }
+// Validamos que exista WooCommerce
+if( ! function_exists('wc_get_products')) {
+  return;
+}
 
 
-  // Construimos los la consulta de las taxonomias para filtra atributos
-  // en la consulta principal en base a los argumentos de la url
-  $tax_query = null;
-  $attrs = wc_get_attribute_taxonomies();
-  $attrs = wp_list_pluck($attrs, 'attribute_name');
+// Recuperamos la lista de atributos que tiene disponible WooCommerce
+$attrs = wc_get_attribute_taxonomies();
+$attrs = wp_list_pluck($attrs, 'attribute_name');
 
 
-  foreach ($attrs as $attr) {
-    $attr = 'pa_'.$attr;
-    if ( ! get_query_var($attr) ) continue;
+ob_start(); //Inicio impresión
 
-    $tax_query[] = [
-      'taxonomy'  => $attr,
-      'field'     => 'slug',
-      'terms'     => get_query_var($attr)
-    ];
-  }
+require_once 'illantas-woo-filters-display.php'; // Muestra la barra lateral de filtros
+require_once 'illantas-woo-products-display.php'; // Muestra la lista de productos
 
-  // Estamos en alguna página de marca, forzamos filtro
-  if ( $param_marca ){
-    $tax_query[] = [
-      'taxonomy'  => 'pa_marca',
-      'field'     => 'slug',
-      'terms'     => $param_marca
-    ];
-  }
-  // Estamos en alguna página de fabricante, forzamos filtro
-  if ( $param_fabricante ){
-    $tax_query[] = [
-      'taxonomy'  => 'pa_fabricante',
-      'field'     => 'slug',
-      'terms'     => $param_fabricante
-    ];
-  }
-
-
-  $paged                   = (get_query_var('paged')) ? absint(get_query_var('paged')) : 1;
-  $ordering                = WC()->query->get_catalog_ordering_args();
-  $ordering['orderby']     = array_shift(explode(' ', $ordering['orderby']));
-  $ordering['orderby']     = stristr($ordering['orderby'], 'price') ? 'meta_value_num' : $ordering['orderby'];
-  $products_per_page       = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
-
-  $sel_products       = wc_get_products(array(
-    'status'               => 'publish',
-    'limit'                => $products_per_page,
-    'page'                 => $paged,
-    'paginate'             => true,
-    'return'               => 'ids',
-    'orderby'              => $ordering['orderby'],
-    'order'                => $ordering['order'],
-    'tax_query'            => array(
-      'relation' => 'AND',
-      $tax_query
-    ),
-  ));
-
-  // Mostrar Filtros
-  ob_start();
-
-  require_once 'illantas-woo-filters-display.php';
-
-  echo "<hr>";
-  echo "Total productos: ". $sel_products->total;
-
-  wc_set_loop_prop('current_page', $paged);
-  wc_set_loop_prop('is_paginated', wc_string_to_bool(true));
-  wc_set_loop_prop('page_template', get_page_template_slug());
-  wc_set_loop_prop('per_page', $products_per_page);
-  wc_set_loop_prop('total', $sel_products->total);
-  wc_set_loop_prop('total_pages', $sel_products->max_num_pages);
-
-
-  if($sel_products) {
-
-    do_action('woocommerce_before_shop_loop');
-    woocommerce_product_loop_start();
-      foreach($sel_products->products as $product) {
-        $post_object = get_post($product);
-        setup_postdata($GLOBALS['post'] =& $post_object);
-        wc_get_template_part('content', 'product');
-      }
-      wp_reset_postdata();
-    woocommerce_product_loop_end();
-    do_action('woocommerce_after_shop_loop');
-  } else {
-    do_action('woocommerce_no_products_found');
-  }
-
-
+// Imprimimos todo el contenido
 echo '<section class="illantas-filter-container">'.ob_get_clean().'</section>';
 
-
-// tax_query exmample
-// ===================
-// [
-//   'taxonomy'  => 'pa_marca',
-//   'field'     => 'slug',
-//   'terms'     => 'ford'
-// ],
-// [
-//   'taxonomy'  => 'pa_anclaje',
-//   'field'     => 'slug',
-//   'terms'     => '5x100'
-// ],
-// [
-//   'taxonomy'  => 'pa_diametro',
-//   'field'     => 'slug',
-//   'terms'     => '17-0'
-// ],
