@@ -23,12 +23,20 @@
     ];
   }
 
-  // Estamos en alguna página de marca
+  // Estamos en alguna página de marca, forzamos filtro
   if ( $param_marca ){
     $tax_query[] = [
       'taxonomy'  => 'pa_marca',
       'field'     => 'slug',
       'terms'     => $param_marca
+    ];
+  }
+  // Estamos en alguna página de fabricante, forzamos filtro
+  if ( $param_fabricante ){
+    $tax_query[] = [
+      'taxonomy'  => 'pa_fabricante',
+      'field'     => 'slug',
+      'terms'     => $param_fabricante
     ];
   }
 
@@ -56,7 +64,6 @@
   // Mostrar Filtros
   ob_start();
 
-  echo "Parámetro: ".$param_marca;
   require_once 'illantas-woo-filters-display.php';
 
   echo "<hr>";

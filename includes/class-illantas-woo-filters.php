@@ -50,6 +50,7 @@ class Illantas_Woo_Filters {
 
         $selected = false;
         foreach ($data as $key => $value) {
+
             if ( ! $selected  && in_array($key, $this->attributes) ) {
                 $selected = true;
                 $out .= '<option value="'.$key.'" selected>'.$value.'</option>';

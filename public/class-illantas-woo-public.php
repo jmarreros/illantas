@@ -62,8 +62,10 @@ class Illantas_Woo_Public {
 
 	public function generar_filtro_illantas( $atts , $content ){
 
-		$atts 		= shortcode_atts(['marca' => ''], $atts, SHORTCODE_NAME );
+		$atts 		= shortcode_atts(['marca' => '', 'fabricante' => ''], $atts, SHORTCODE_NAME );
+
 		$param_marca 	= $atts['marca'];
+		$param_fabricante = $atts['fabricante'];
 		if ( is_singular() ){
 			include_once 'partials/illantas-woo-shortcode-display.php';
 		}
