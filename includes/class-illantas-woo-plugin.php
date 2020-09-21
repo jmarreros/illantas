@@ -69,7 +69,7 @@ class Illantas_Woo {
 	public function __construct() {
 
 		$this->plugin_name = 'illantas-woo';
-		$this->version = '1.0.0';
+		$this->version = '1.2.0';
 
 		$this->load_dependencies();
 		$this->set_locale();

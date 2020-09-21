@@ -61,9 +61,12 @@ class Illantas_Woo_Public {
 	}
 
 	public function generar_filtro_illantas( $atts , $content ){
-		$atts 		= shortcode_atts(['marca' => 'todos'], $atts, SHORTCODE_NAME );
-		$marca 	= $atts['marca'];
-		include_once 'partials/illantas-woo-shortcode-display.php';
+
+		$atts 		= shortcode_atts(['marca' => ''], $atts, SHORTCODE_NAME );
+		$param_marca 	= $atts['marca'];
+		if ( is_singular() ){
+			include_once 'partials/illantas-woo-shortcode-display.php';
+		}
 	}
 
 	/**
@@ -73,7 +76,7 @@ class Illantas_Woo_Public {
 	 */
 	public function enqueue_styles() {
 
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/illantas-woo-public.css', array(), $this->version, 'all' );
+		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/illantas-filter.css', array(), $this->version, 'all' );
 
 	} // enqueue_styles()
 
@@ -84,7 +87,7 @@ class Illantas_Woo_Public {
 	 */
 	public function enqueue_scripts() {
 
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/illantas-woo-public.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/illantas-filter.js', array( 'jquery' ), $this->version, true );
 
 	} // enqueue_scripts()
 

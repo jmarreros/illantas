@@ -35,22 +35,26 @@ class Illantas_Woo_Filters {
         // Extraemos sólo el nombre y slug
         $list = wp_list_pluck($list, 'name', 'slug');
 
-        return $this->create_HTML_select('dropdown_'.$tax, $tax, $list, '');
+        return $this->create_HTML_select('idropdown_'.$tax, $tax, $list, '');
     }
 
 
     // Crea un lista HTML genérica
-    private function create_HTML_select($class, $url, $data, $selected){
+    private function create_HTML_select($class, $url, $data){
         if ( ! count($data) ) return false;
 
-        $out = '<select class="'.esc_attr($class).'"';
-        $out .= ' data-filter-url="'.esc_attr ($url).'">';
+        $out = '<select class="idropdown '.esc_attr($class).'"';
+        $out .= ' data-filter-url="pa_'.esc_attr ($url).'">';
 
-        $out .= '<option value=""';
-        $out .= ( ! $selected ) ? ' selected ':'';
-        $out .= '>Todos</option>';
+        $out .= '<option value="">Todos</option>';
 
+        $selected = false;
         foreach ($data as $key => $value) {
+            if ( ! $selected  && in_array($key, $this->attributes) ) {
+                $selected = true;
+                $out .= '<option value="'.$key.'" selected>'.$value.'</option>';
+                continue;
+            }
             $out .= '<option value="'.$key.'">'.$value.'</option>';
         }
         $out .= '</select>';

@@ -7,9 +7,10 @@
 
   // Construimos los la consulta de las taxonomias para filtra atributos
   // en la consulta principal en base a los argumentos de la url
-  $tax_query = array();
+  $tax_query = null;
   $attrs = wc_get_attribute_taxonomies();
   $attrs = wp_list_pluck($attrs, 'attribute_name');
+
 
   foreach ($attrs as $attr) {
     $attr = 'pa_'.$attr;
@@ -21,6 +22,16 @@
       'terms'     => get_query_var($attr)
     ];
   }
+
+  // Estamos en alguna página de marca
+  if ( $param_marca ){
+    $tax_query[] = [
+      'taxonomy'  => 'pa_marca',
+      'field'     => 'slug',
+      'terms'     => $param_marca
+    ];
+  }
+
 
   $paged                   = (get_query_var('paged')) ? absint(get_query_var('paged')) : 1;
   $ordering                = WC()->query->get_catalog_ordering_args();
@@ -43,6 +54,9 @@
   ));
 
   // Mostrar Filtros
+  ob_start();
+
+  echo "Parámetro: ".$param_marca;
   require_once 'illantas-woo-filters-display.php';
 
   echo "<hr>";
@@ -58,8 +72,6 @@
 
   if($sel_products) {
 
-    ob_start();
-
     do_action('woocommerce_before_shop_loop');
     woocommerce_product_loop_start();
       foreach($sel_products->products as $product) {
@@ -74,7 +86,8 @@
     do_action('woocommerce_no_products_found');
   }
 
-echo ob_get_clean();
+
+echo '<section class="illantas-filter-container">'.ob_get_clean().'</section>';
 
 
 // tax_query exmample
