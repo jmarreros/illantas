@@ -1,4 +1,5 @@
 <?php
+// Mostramos el shortcode
 
 // Validamos que exista WooCommerce
 if( ! function_exists('wc_get_products')) {

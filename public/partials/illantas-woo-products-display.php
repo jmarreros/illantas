@@ -1,4 +1,6 @@
 <?php
+// Construimos la consulta de las taxonomias para filtra atributos en base a los argumentos
+// de la url de la variable $attrs y mostramos la lista de productos
 
 // Parámetros desde archivos externos
 // $attrs
@@ -6,10 +8,6 @@
 // $param_marca
 
 $tax_query = null;
-
-
-// Construimos los la consulta de las taxonomias para filtra atributos
-// en base a los argumentos de la url de la variable $attrs
 
 foreach ($attrs as $attr) {
   $attr = 'pa_'.$attr;
@@ -63,8 +61,12 @@ $sel_products       = wc_get_products(array(
 
 // Muestra la lista de produtos
 echo "<section class='illantas-filter-products'>";
-echo "<hr>";
-echo "Total productos: ". $sel_products->total;
+
+echo "<div class='illantas-products-count'>";
+if ( $sel_products->total > 1 ){
+  echo "Te podemos ofrecer <span> ". $sel_products->total ." productos </span> disponibles";
+}
+echo "</div>";
 
 wc_set_loop_prop('current_page', $paged);
 wc_set_loop_prop('is_paginated', wc_string_to_bool(true));

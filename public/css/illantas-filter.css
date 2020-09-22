@@ -1,4 +1,104 @@
-/**
- * All of the CSS for your public-facing functionality should be
- * included in this file.
- */
+.illantas-filter-container .shop-loop-before,
+.illantas-filter-container .shop-loop-after {
+  display: block !important;
+}
+
+.illantas-filter-container .gridlist-toggle {
+  display: none;
+}
+
+.illantas-filter-container .illantas-products-count {
+  padding: 10px 0;
+}
+
+.illantas-filter-container .illantas-products-count span {
+  font-weight: bold;
+}
+
+.illantas-filter-container .shop-loop-before {
+  background-color: #f4f4f4;
+  padding: 10px;
+  margin-bottom: 14px;
+}
+
+.illantas-filter-container .shop-loop-before label {
+  font-weight: bold;
+}
+.illantas-filter-container .shop-loop-before .woocommerce-ordering {
+  float: left;
+  margin: 0;
+}
+
+.illantas-filter-container .shop-loop-before .woocommerce-pagination {
+  float: right;
+  margin: 0;
+}
+
+.illantas-filter-sidebar {
+  padding: 20px;
+  padding-left: 0;
+}
+
+.illantas-filter-sidebar h3 {
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: bold;
+}
+
+.btn-filter-clean {
+  display: block;
+  margin-top: 18px;
+  padding: 5px;
+  background-color: black;
+  max-width: 100px;
+  color: white;
+  text-decoration: none;
+  text-align: center;
+  font-weight: bold;
+  border-radius: 4px;
+}
+
+.btn-filter-clean:hover {
+  color: white;
+  background-color: #0088cc;
+  text-decoration: none;
+}
+
+@media (min-width: 978px) {
+  .illantas-filter-container {
+    display: flex;
+  }
+  .illantas-filter-sidebar {
+    width: 22%;
+  }
+  .illantas-filter-products {
+    width: 78%;
+  }
+  .illantas-filter-sidebar label {
+    width: 100%;
+    font-weight: bold;
+    margin-bottom: 0;
+  }
+  .illantas-filter-sidebar select {
+    width: 100%;
+  }
+  .illantas-filter-sidebar .illantas-filter {
+    margin-top: 12px;
+  }
+}
+
+@media (max-width: 977px) {
+  .illantas-filter-sidebar .illantas-filter {
+    display: flex;
+    margin-top: 10px;
+    align-items: center;
+  }
+  .illantas-filter-sidebar .illantas-filter label {
+    font-weight: bold;
+    margin-bottom: 0;
+    min-width: 30%;
+  }
+  .illantas-filter-sidebar .illantas-filter select {
+    width: 70%;
+  }
+}

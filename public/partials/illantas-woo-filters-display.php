@@ -1,9 +1,9 @@
 <?php
 
 // Muestra los controles de seleccion para los distintos atributos
-// De acuerdo a las dependencias con productos
+// de acuerdo a las dependencias con productos
 
-// variable desde archivo externo
+// Parámetros desde archivo externo
 // $param_fabricante
 // $param_marca
 // $attrs
@@ -32,11 +32,26 @@ if ( $param_fabricante ){
 // Creamos la clase pasándo como parámetro los atributos seleccionados
 $filtro_marcas = new Illantas_Woo_Filters($args);
 
-// Creamos el select para marca
+// Muestra los filtros de acuerdo al orden en el array:  key => Etiqueta
+$show_filters = [
+    'marca' => 'Marca:',
+    'modelo' => 'Modelo:',
+    'diametro' => 'Diámetro:',
+    'anchura' => 'Ancho:',
+    'acabado' => 'Acabado:',
+    'fabricante' => 'Fabricante:'
+];
+
+// Imprimimos la sección de filtros
 echo "<section class='illantas-filter-sidebar'>";
-echo " <strong>Marca</strong>: ".$filtro_marcas->create_generic_select('marca');
-echo " <strong>Diámetro</strong> ".$filtro_marcas->create_generic_select('diametro');
-echo " <strong>Fabricante</strong> ".$filtro_marcas->create_generic_select('fabricante');
-echo " <strong>Anclaje</strong> ".$filtro_marcas->create_generic_select('anclaje');
-echo " <strong>Modelo</strong> ".$filtro_marcas->create_generic_select('modelo');
+echo "<h3>Compara y compra la mejor llanta de coche</h3>";
+
+foreach ($show_filters as $key => $value) {
+    echo "<div class='illantas-filter'>";
+    echo "<label>".$value."</label>";
+    echo $filtro_marcas->create_generic_select($key);
+    echo "</div>";
+}
+
+echo " <a class='btn-filter-clean' href='#'>Limpiar</a>";
 echo "</section>";
