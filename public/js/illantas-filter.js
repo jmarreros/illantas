@@ -33,7 +33,7 @@
 
 
 			// Para otros atributos
-			const currentURL = baseURL + window.location.pathname;
+			const currentURL = baseURL + window.location.pathname.replace(/\/page\/\d+/i,"");
 
 			// Formamos los parámetros del filtro
 			let urlParams = new Object;

@@ -39,7 +39,7 @@ $show_filters = [
     'diametro' => 'Diámetro:',
     'anchura' => 'Ancho:',
     'acabado' => 'Acabado:',
-    'fabricante' => 'Fabricante:'
+    'fabricante' => 'Fabricante:',
 ];
 
 // Imprimimos la sección de filtros
