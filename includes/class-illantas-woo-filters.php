@@ -61,12 +61,15 @@ class Illantas_Woo_Filters {
         return $list;
     }
 
-    // Funcion axiliar para comparar arrays
+    // Funcion axiliar para comparar arrays, comparamos por nombre debido a las diferencias del slug
     private function compare_arrays_model($rel, $pro){
         $arr = [];
         foreach ($rel as $item) {
-            if ( array_key_exists($item['slug'], $pro) ){
-                $arr[$item['slug']] = $item['name'];
+            foreach($pro as $key => $val){
+                if ($item['name'] === $val){
+                    $arr[$key]=$val;
+                    break;
+                }
             }
         }
         return $arr;
