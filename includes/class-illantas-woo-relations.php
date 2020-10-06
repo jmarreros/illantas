@@ -51,6 +51,27 @@ class Illantas_Woo_Relations {
 		return $modelos_marca;
 	}
 
+	// Recupera todos los modelos de una marca pasándole el slug de la marca y devuelve un array asociativo de modelos
+	public function get_modelos_marca_by_slug( $slug_marca ){
+		global $wpdb;
+
+		$term_marca = get_term_by('slug', $slug_marca, TAX_MARCA);
+		$id_marca = $term_marca->term_id;
+
+		$query = "SELECT t.name, t.slug FROM {$wpdb->term_taxonomy} tt
+					INNER JOIN {$wpdb->terms} t USING(term_id)
+					INNER JOIN {$wpdb->termmeta} tm USING(term_id)
+					WHERE tt.taxonomy = '".TAX_MODELO."'
+					AND tm.meta_key = '".TERM_META_MARCA."'
+					AND tm.meta_value = {$id_marca}
+					ORDER BY t.name";
+
+
+		$result = $wpdb->get_results( $query , ARRAY_A);
+
+		return $result;
+	}
+
 	// Recupera todos los modelos de un anclaje pasandole el id
 	public function get_modelos_anclaje( $id_anclaje ){
 

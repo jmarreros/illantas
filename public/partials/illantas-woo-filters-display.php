@@ -10,7 +10,6 @@
 
 include_once ILLANTAS_DIR . 'includes/class-illantas-woo-filters.php';
 
-
 //Creamos el array de valores para los filtros desde la variable $attrs;
 $args = array();
 foreach ($attrs as $attr) {
@@ -30,11 +29,11 @@ if ( $param_fabricante ){
 }
 
 // Creamos la clase pasándo como parámetro los atributos seleccionados
-$filtro_marcas = new Illantas_Woo_Filters($args);
+$filtro_selects = new Illantas_Woo_Filters($args);
 
 // Muestra los filtros de acuerdo al orden en el array:  key => Etiqueta
 $show_filters = [
-    'marca' => 'Marca:',
+    'marca' => 'Marca:', // La marca incluye el modelo
     'modelo' => 'Modelo:',
     'diametro' => 'Diámetro:',
     'anchura' => 'Ancho:',
@@ -49,7 +48,11 @@ echo "<h3>Compara y compra la mejor llanta de coche</h3>";
 foreach ($show_filters as $key => $value) {
     echo "<div class='illantas-filter'>";
     echo "<label>".$value."</label>";
-    echo $filtro_marcas->create_generic_select($key);
+    if ( $key !== 'modelo' || ! $param_marca ){ // Si la marca esta en todos o sea diferente del modelo
+        echo $filtro_selects->create_generic_select($key);
+    } else {
+        echo $filtro_selects->create_modelo_select($param_marca); // Sólo cuando una marca esta seleccionada
+    }
     echo "</div>";
 }
 
