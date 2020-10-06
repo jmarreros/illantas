@@ -25,6 +25,30 @@ class Illantas_Woo_Filters {
         $this->data = $this->get_data_attributes();
     }
 
+
+    // Obtiene datos y crea lista de acuerdo a la taxonomia
+    public function create_generic_select($tax){
+        $list = $this->filtrar_datos($tax);
+        return $this->create_HTML_select('idropdown_'.$tax, $tax, $list);
+    }
+
+
+    // Caso especial para el modelo que se llenará en base a la marca
+    public function create_modelo_select($param_marca){
+        // Recuperarmos los modelos relacionados con las marcas
+        $relations = new Illantas_Woo_Relations();
+        $relation_modelos =  $relations->get_modelos_marca_by_slug($param_marca);
+
+        // Recuperamos los modelos que se usan en todos los productos
+        $products_modelos = $this->filtrar_datos('modelo');
+
+        // Comparamos ambos arrays
+        $modelos = $this->compare_arrays_model($relation_modelos, $products_modelos);
+
+        return $this->create_HTML_select('idropdown_modelo', 'modelo', $modelos);
+    }
+
+
     // Funcion para filtrar los datos que ya se han gurado en la variable data
     private function filtrar_datos($tax){
         $list = array();
@@ -37,27 +61,15 @@ class Illantas_Woo_Filters {
         return $list;
     }
 
-    // Obtiene datos y crea lista de acuerdo a la taxonomia
-    public function create_generic_select($tax){
-        $list = $this->filtrar_datos($tax);
-        return $this->create_HTML_select('idropdown_'.$tax, $tax, $list, '');
-    }
-
-
-    // Caso especial para el modelo que se llenará en base a la marca
-    public function create_modelo_select($param_marca){
-
-        // Recuperarmos los modelos relacionados con las marcas
-        $relations = new Illantas_Woo_Relations();
-        $relation_modelos =  $relations->get_modelos_marca_by_slug($param_marca);
-
-        // Recuperamos los modelos que se usan en todos los productos
-        $products_modelos = $this->filtrar_datos('modelo');
-
-        error_log(print_r($relation_modelos, true));
-        error_log(print_r($products_modelos, true));
-
-        return $param_marca;
+    // Funcion axiliar para comparar arrays
+    private function compare_arrays_model($rel, $pro){
+        $arr = [];
+        foreach ($rel as $item) {
+            if ( array_key_exists($item['slug'], $pro) ){
+                $arr[$item['slug']] = $item['name'];
+            }
+        }
+        return $arr;
     }
 
 
