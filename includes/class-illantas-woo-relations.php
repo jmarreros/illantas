@@ -53,6 +53,9 @@ class Illantas_Woo_Relations {
 
 	// Recupera todos los modelos de una marca pasándole el slug de la marca y devuelve un array asociativo de modelos
 	public function get_modelos_marca_by_slug( $slug_marca ){
+
+		if ( is_multisite() ) switch_to_blog(1);
+
 		global $wpdb;
 
 		$term_marca = get_term_by('slug', $slug_marca, TAX_MARCA);
@@ -68,6 +71,8 @@ class Illantas_Woo_Relations {
 
 
 		$result = $wpdb->get_results( $query , ARRAY_A);
+
+		if ( is_multisite() ) restore_current_blog();
 
 		return $result;
 	}
