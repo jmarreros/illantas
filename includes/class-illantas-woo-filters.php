@@ -11,7 +11,7 @@
  * @author 			jmarreros
  */
 
-include_once 'Illantas_Woo_Relations.php';
+include_once ILLANTAS_DIR.'includes/class-illantas-woo-relations.php';
 
 class Illantas_Woo_Filters {
 
