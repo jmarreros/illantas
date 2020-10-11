@@ -17,7 +17,7 @@ Por ejemplo:
 </code>
 
 <p>
-Para usarlo de esta forma se recomienda tener una página llamada: <i>llantas</i>
+Para usarlo de esta forma se recomienda agregar el shortcode en la página de inicio.
 </p>
 
 <hr>
