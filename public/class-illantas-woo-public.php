@@ -72,6 +72,26 @@ class Illantas_Woo_Public {
 		}
 	}
 
+	/*
+		Para asegurarse de agregar las variables en los parámetros
+	*/
+	// public function query_vars_illantas( $vars ){
+	// 	$arr = [
+	// 		'pa_modelo',
+	// 		'pa_diametro',
+	// 		'pa_anchura',
+	// 		'pa_acabado',
+	// 	];
+
+	// 	foreach ($arr as $value) {
+	// 		if ( ! in_array($value, $vars ) ){
+	// 			$vars[] = $value;
+	// 		}
+	// 	}
+
+	// 	return $vars;
+	// }
+
 	/**
 	 * Register the stylesheets for the public-facing side of the site.
 	 *

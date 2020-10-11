@@ -3,6 +3,7 @@
 // de la url de la variable $attrs y mostramos la lista de productos
 
 // Parámetros desde archivos externos
+// Funcion get_custom_params
 // $attrs
 // $param_fabricante
 // $param_marca
@@ -11,12 +12,12 @@ $tax_query = null;
 
 foreach ($attrs as $attr) {
   $attr = 'pa_'.$attr;
-  if ( ! get_query_var($attr) ) continue;
+  if ( ! get_custom_params($attr) ) continue;
 
   $tax_query[] = [
     'taxonomy'  => $attr,
     'field'     => 'slug',
-    'terms'     => get_query_var($attr)
+    'terms'     => get_custom_params($attr)
   ];
 }
 
@@ -37,10 +38,10 @@ if ( $param_fabricante ){
   ];
 }
 
-
-$paged                   = (get_query_var('paged')) ? absint(get_query_var('paged')) : 1;
+$paged                   = (get_query_var('paged') || get_query_var('page')) ? absint(get_query_var('paged')) + absint(get_query_var('page')) : 1;
 $ordering                = WC()->query->get_catalog_ordering_args();
-$ordering['orderby']     = array_shift(explode(' ', $ordering['orderby']));
+$arr_orderby             = explode(' ', $ordering['orderby']);
+$ordering['orderby']     = array_shift($arr_orderby);
 $ordering['orderby']     = stristr($ordering['orderby'], 'price') ? 'meta_value_num' : $ordering['orderby'];
 $products_per_page       = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
 
@@ -57,7 +58,6 @@ $sel_products       = wc_get_products(array(
     $tax_query
   ),
 ));
-
 
 // Muestra la lista de produtos
 echo "<section class='illantas-filter-products'>";

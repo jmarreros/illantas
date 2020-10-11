@@ -4,19 +4,22 @@
 // de acuerdo a las dependencias con productos
 
 // Parámetros desde archivo externo
+// Funcion get_custom_params
 // $param_fabricante
 // $param_marca
 // $attrs
 
 include_once ILLANTAS_DIR . 'includes/class-illantas-woo-filters.php';
 
+
+
 //Creamos el array de valores para los filtros desde la variable $attrs;
 $args = array();
 foreach ($attrs as $attr) {
     $attr = 'pa_'.$attr;
-    if ( ! get_query_var($attr) ) continue;
+    if ( ! get_custom_params($attr) ) continue;
 
-    $args[] = get_query_var($attr);
+    $args[] = get_custom_params($attr);
 }
 
 // Forzar filtro para una página de marca

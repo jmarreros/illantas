@@ -6,7 +6,7 @@
 	const fabricanteTax = 'pa_fabricante';
 	const marcaPages = '/llantas-para-';
 	const fabricantesPages = '/llantas-';
-	const genericPage = '/llantas';
+	const genericPage = '/';
 
 	// Validamos si exixte el contenedor del shortcode
 	if ( $('.illantas-filter-container').length ){
