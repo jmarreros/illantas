@@ -38,12 +38,9 @@ if ( $param_fabricante ){
   ];
 }
 
-$paged                   = (get_query_var('paged') || get_query_var('page')) ? absint(get_query_var('paged')) + absint(get_query_var('page')) : 1;
-$ordering                = WC()->query->get_catalog_ordering_args();
-$arr_orderby             = explode(' ', $ordering['orderby']);
-$ordering['orderby']     = array_shift($arr_orderby);
-$ordering['orderby']     = stristr($ordering['orderby'], 'price') ? 'meta_value_num' : $ordering['orderby'];
-$products_per_page       = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
+$paged                = (get_query_var('paged') || get_query_var('page')) ? absint(get_query_var('paged')) + absint(get_query_var('page')) : 1;
+$ordering             = get_ordering();
+$products_per_page    = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
 
 $sel_products       = wc_get_products(array(
   'status'               => 'publish',
@@ -51,6 +48,7 @@ $sel_products       = wc_get_products(array(
   'page'                 => $paged,
   'paginate'             => true,
   'return'               => 'ids',
+  'meta_key'             => $ordering['meta_key'],
   'orderby'              => $ordering['orderby'],
   'order'                => $ordering['order'],
   'tax_query'            => array(
@@ -96,3 +94,35 @@ if($sel_products) {
 
 echo "</section>";
 
+
+
+// $ordering                = WC()->query->get_catalog_ordering_args();
+// $arr_orderby             = explode(' ', $ordering['orderby']);
+// $ordering['orderby']     = array_shift($arr_orderby);
+// $ordering['orderby']     = stristr($ordering['orderby'], 'price') ? 'meta_value_num' : $ordering['orderby'];
+
+
+// error_log('===== Sel_1 =====');
+// error_log(print_r($sel_products,true));
+
+// $args = array(
+//   'post_type'       => 'product',
+//   'post_status'     => 'publish',
+//   'posts_per_page'  => $products_per_page,
+//   'paged'           => $paged,
+//   'fields'          => 'ids',
+//   'meta_key'        => '_price',
+//   'orderby'         => $ordering['orderby'],
+//   'order'           => $ordering['order'],
+//   'tax_query'       => array(
+//     'relation' => 'AND',
+//     $tax_query
+//   ),
+// );
+
+// $sel_products2 = new WP_Query( $args );
+
+// error_log('===== Sel_2 =====');
+// error_log(print_r($sel_products2->posts,true));
+// error_log($sel_products2->found_posts);
+// error_log($sel_products2->max_num_pages);

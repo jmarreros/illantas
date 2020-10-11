@@ -1,17 +1,13 @@
 <?php
+// para usar la función get_custom_params()
+require_once ILLANTAS_DIR . '/helpers/functions.php';
+
 // Mostramos el shortcode
 
 // Validamos que exista WooCommerce
 if( ! function_exists('wc_get_products')) {
   return;
 }
-
-// Funcion personalizada para obtener los parámetros
-function get_custom_params($param){
-  if ( isset($_GET[$param]) ) return $_GET[$param];
-  else return false;
-}
-
 
 // Recuperamos la lista de atributos que tiene disponible WooCommerce
 $attrs = wc_get_attribute_taxonomies();
