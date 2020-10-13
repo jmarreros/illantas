@@ -6,31 +6,33 @@
 	const fabricanteTax = 'pa_fabricante';
 	const marcaPages = '/llantas-para-';
 	const fabricantesPages = '/llantas-';
-	const genericPage = '/';
+	let currentPage = dcms_vars.currentPage; // variable pasada desde WordPress
 
 	// Validamos si exixte el contenedor del shortcode
 	if ( $('.illantas-filter-container').length ){
 
 		// Boton limpiar
-		$('.btn-filter-clean').attr('href', baseURL + genericPage);
+		$('.btn-filter-clean').attr('href', baseURL + currentPage);
 
 		// Evento de cambio en los selects
 		$('.idropdown').on('change', function(){
 
-			// Se esta seleccionando el atributo de marca enviamos a una página de marca
-			if ( $(this).data('filter-url') == marcaTax ){
-				const basePage =  $(this).val() ? marcaPages + $(this).val() : genericPage;
-				window.location = baseURL + basePage;
-				return false;
-			}
+			// Si estamos en el home no tiene que ir a página de marcas ni página de fabricantes
+			if ( currentPage !== '/' ){
+				// Se esta seleccionando el atributo de marca enviamos a una página de marca
+				if ( $(this).data('filter-url') == marcaTax ){
+					const basePage =  $(this).val() ? marcaPages + $(this).val() : currentPage;
+					window.location = baseURL + basePage;
+					return false;
+				}
 
-			// Se esta seleccionando el atributo de fabricante enviamos a una página de fabricante
-			if ( $(this).data('filter-url') == fabricanteTax ){
-				const basePage =  $(this).val() ? fabricantesPages + $(this).val() : genericPage;
-				window.location = baseURL + basePage;
-				return false;
+				// Se esta seleccionando el atributo de fabricante enviamos a una página de fabricante
+				if ( $(this).data('filter-url') == fabricanteTax ){
+					const basePage =  $(this).val() ? fabricantesPages + $(this).val() : currentPage;
+					window.location = baseURL + basePage;
+					return false;
+				}
 			}
-
 
 			// Para otros atributos
 			const currentURL = baseURL + window.location.pathname.replace(/\/page\/\d+/i,"");
@@ -39,9 +41,13 @@
 			let urlParams = new Object;
 
 			$('.idropdown').each(function(){
- 				// excluimos el filtro de marca y de fabricante
-				if ( $(this).data('filter-url') == marcaTax || 
+
+				// Validación si est en el home no debe haber exclusiones para marca y fabricantes
+				if ( currentPage !== '/' ){
+					// excluimos el filtro de marca y de fabricante
+					if ( $(this).data('filter-url') == marcaTax || 
 					$(this).data('filter-url') == fabricanteTax) return;
+				}
 
 				// Si es diferente de todos
 				if ( $(this).val() ){

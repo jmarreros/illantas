@@ -72,26 +72,6 @@ class Illantas_Woo_Public {
 		}
 	}
 
-	/*
-		Para asegurarse de agregar las variables en los parámetros
-	*/
-	// public function query_vars_illantas( $vars ){
-	// 	$arr = [
-	// 		'pa_modelo',
-	// 		'pa_diametro',
-	// 		'pa_anchura',
-	// 		'pa_acabado',
-	// 	];
-
-	// 	foreach ($arr as $value) {
-	// 		if ( ! in_array($value, $vars ) ){
-	// 			$vars[] = $value;
-	// 		}
-	// 	}
-
-	// 	return $vars;
-	// }
-
 	/**
 	 * Register the stylesheets for the public-facing side of the site.
 	 *
@@ -112,6 +92,41 @@ class Illantas_Woo_Public {
 
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/illantas-filter.js', array( 'jquery' ), $this->version, true );
 
+		// Definimos la página base para el shortcode
+		$current_page = BASE_PAGE_SHORTCODE;
+		if (is_home() || is_front_page()){
+			$current_page = '/';
+		}
+
+		//Definimos las variables WordPress a enviar dentro de un array
+		$params = array (
+			'currentPage' => $current_page
+		);
+
+		//Usamos esta función para que coloque los valores inline
+		wp_localize_script($this->plugin_name,'dcms_vars', $params);
+
 	} // enqueue_scripts()
 
 } // class
+
+
+	/*
+		Para asegurarse de agregar las variables en los parámetros
+	*/
+	// public function query_vars_illantas( $vars ){
+	// 	$arr = [
+	// 		'pa_modelo',
+	// 		'pa_diametro',
+	// 		'pa_anchura',
+	// 		'pa_acabado',
+	// 	];
+
+	// 	foreach ($arr as $value) {
+	// 		if ( ! in_array($value, $vars ) ){
+	// 			$vars[] = $value;
+	// 		}
+	// 	}
+
+	// 	return $vars;
+	// }
