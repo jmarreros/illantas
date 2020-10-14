@@ -18,6 +18,8 @@ Por ejemplo:
 
 <p>
 Para usarlo de esta forma se recomienda agregar el shortcode en la página de inicio.
+<br>
+Adicionalmente también se debe contar con una página llamada llantas para los filtros que se basan en páginas.
 </p>
 
 <hr>
