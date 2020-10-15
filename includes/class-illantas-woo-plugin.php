@@ -199,7 +199,7 @@ class Illantas_Woo {
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 		$this->loader->add_action( 'init', $plugin_public, 'illantas_shortcodes' );
-		// $this->loader->add_filter( 'query_vars', $plugin_public, 'query_vars_illantas' );
+		$this->loader->add_action( 'woocommerce_product_get_attributes', $plugin_public, 'illantas_hide_attributes_single_product', 10, 2 );
 
 	} // define_public_hooks()
 
@@ -258,5 +258,9 @@ class Illantas_Woo {
 } // class
 
 
+
+
+
+// $this->loader->add_filter( 'query_vars', $plugin_public, 'query_vars_illantas' );
 
 

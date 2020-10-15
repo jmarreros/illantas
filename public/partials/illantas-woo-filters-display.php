@@ -44,7 +44,7 @@ $show_filters = [
 
 // Imprimimos la sección de filtros
 echo "<section class='illantas-filter-sidebar'>";
-echo "<h3>Compara y compra la mejor llanta de coche</h3>";
+echo "<h3>Encuentra aquí tus llantas</h3>";
 
 // Validación para que funcione en el home la función de create_modelo_select()
 if ( is_home() || is_front_page() ){

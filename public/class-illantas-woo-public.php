@@ -108,6 +108,32 @@ class Illantas_Woo_Public {
 
 	} // enqueue_scripts()
 
+
+	// Ocultar algunos atributos en la página detalle de producto
+	public function illantas_hide_attributes_single_product($attributes, $product){
+
+		if ( ! is_singular('product') ) return $attributes;
+
+		$hidden_attributes = [
+			'pa_ano',
+			'pa_modelo',
+			'pa_marca',
+		];
+
+		foreach ( $hidden_attributes as $hidden_attribute ) {
+
+			if ( ! isset( $attributes[ $hidden_attribute ] ) ) {
+				continue;
+			}
+
+			$attribute = $attributes[ $hidden_attribute ];
+
+			$attribute->set_visible( false );
+		}
+
+		return $attributes;
+	}
+
 } // class
 
 
