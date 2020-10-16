@@ -53,6 +53,7 @@ if ( is_home() || is_front_page() ){
     $param_marca = get_custom_params('pa_marca');
 }
 
+echo "<div class='illantas-filters'>";
 foreach ($show_filters as $key => $value) {
     echo "<div class='illantas-filter'>";
     echo "<label>".$value."</label>";
@@ -63,6 +64,7 @@ foreach ($show_filters as $key => $value) {
     }
     echo "</div>";
 }
+echo "</div>";
 
 echo " <a class='btn-filter-clean' href='#'>Limpiar</a>";
 echo "</section>";
