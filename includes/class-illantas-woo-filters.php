@@ -49,7 +49,7 @@ class Illantas_Woo_Filters {
     }
 
 
-    // Funcion para filtrar los datos que ya se han gurado en la variable data
+    // Funcion para filtrar los datos que ya se han guardado en la variable data
     private function filtrar_datos($tax){
         $list = array();
         // Filtramos los datos de sólo una taxonomía específica
@@ -112,11 +112,19 @@ class Illantas_Woo_Filters {
         $condition = '';
         $having = '';
 
+        // Condiciones de los parámetros
         if ($count > 0){
-            $condition = " AND t.slug IN ('". implode("','", $this->attributes) ."') ";
+            // formar array key y valor concatenado
+            $concat_attributes = [];
+            foreach ($this->attributes as $key => $value) {
+                $concat_attributes[] = $key.$value;
+            }
+
+            $condition = " AND CONCAT(tt.taxonomy, t.slug) IN ('". implode("','", $concat_attributes) ."') ";
             $having = " HAVING count(p.id) >= $count";
         }
 
+        // Subconsulta
         $subquery = "SELECT p.id FROM {$wpdb->posts} p
                     INNER JOIN {$wpdb->term_relationships} rs ON rs.object_id = p.id
                     INNER JOIN {$wpdb->term_taxonomy} tt USING (term_taxonomy_id)
