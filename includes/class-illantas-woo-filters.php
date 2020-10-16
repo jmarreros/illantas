@@ -77,21 +77,23 @@ class Illantas_Woo_Filters {
 
 
     // Crea un lista HTML genérica
-    private function create_HTML_select($class, $url, $data){
+    private function create_HTML_select($class, $tax, $data){
         if ( ! count($data) ) return false;
 
+        $tax = 'pa_'.esc_attr ($tax);
         $out = '<select class="idropdown '.esc_attr($class).'"';
-        $out .= ' data-filter-url="pa_'.esc_attr ($url).'">';
+        $out .= ' data-filter-url="'.$tax.'">';
 
         $out .= '<option value="">Todos</option>';
 
         $selected = false;
         foreach ($data as $key => $value) {
 
-            if ( ! $selected  && in_array($key, $this->attributes) ) {
+            if ( ! $selected  && isset($this->attributes[$tax]) && $this->attributes[$tax] == $key) {
                 $selected = true;
                 $out .= '<option value="'.$key.'" selected>'.$value.'</option>';
                 continue;
+
             }
             $out .= '<option value="'.$key.'">'.$value.'</option>';
         }

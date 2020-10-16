@@ -17,17 +17,19 @@ foreach ($attrs as $attr) {
     $attr = 'pa_'.$attr;
     if ( ! get_custom_params($attr) ) continue;
 
-    $args[] = get_custom_params($attr);
+    $args[$attr] = get_custom_params($attr);
 }
 
 // Forzar filtro para una página de marca
 if ( $param_marca ){
-    $args[] = $param_marca;
+    $args['pa_marca'] = $param_marca;
 }
 // Forzar filtro para una página de fabricante
 if ( $param_fabricante ){
-    $args[] = $param_fabricante;
+    $args['pa_fabricante'] = $param_fabricante;
 }
+
+// error_log(print_r($args,true));
 
 // Creamos la clase pasándo como parámetro los atributos seleccionados
 $filtro_selects = new Illantas_Woo_Filters($args);
