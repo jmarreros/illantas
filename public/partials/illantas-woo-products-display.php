@@ -60,7 +60,7 @@ $sel_products       = wc_get_products(array(
 // Muestra la lista de produtos
 echo "<section class='illantas-filter-products'>";
 
-echo "<div class='illantas-products-count'>";
+echo "<div id='fixed-sidebar-aux' class='illantas-products-count'>";
 if ( $sel_products->total > 1 ){
   echo "Te podemos ofrecer <span> ". $sel_products->total ." productos </span> disponibles";
 }

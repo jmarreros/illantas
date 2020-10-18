@@ -1,3 +1,5 @@
+// Para establecer la barra como Fixed
+
 (function( $ ) {
 	'use strict';
 
@@ -64,4 +66,28 @@
 
 	}
 
+	const options = {
+		root: null,
+		rootMargin: '0px',
+		threshold: 1,
+	}
+
+	const observer = new IntersectionObserver(dcmsFixedSidebar, options)
+	observer.observe(document.getElementById('fixed-sidebar-aux'));
+
+	function dcmsFixedSidebar( entries, observer ){
+		if ( entries[0].isIntersecting ){
+			$('#tmpSidebar').remove();
+		} else {
+			$('.illantas-filter-sidebar').clone().attr('id', 'tmpSidebar').appendTo('.header-main');
+		}
+	}
+
+
+
 })( jQuery );
+
+
+
+
+

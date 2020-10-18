@@ -39,7 +39,7 @@
   padding-left: 0;
   background-color: #0088cc;
   padding: 10px 14px;
-  border-radius: 5px;
+  /* border-radius: 5px; */
 }
 
 .illantas-filter-sidebar h3 {
@@ -123,3 +123,14 @@
     width: 70%;
   }
 }
+
+/* Fixed */
+/* @media (min-width: 979px) {
+  .home .is-fixed .illantas-filter-sidebar {
+    position: fixed;
+    z-index: 99999;
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
+} */

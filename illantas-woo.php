@@ -11,7 +11,7 @@
  * Plugin Name: 		Illantas Woo
  * Plugin URI: 			https://mundollantas.es/
  * Description: 		Plugins para mostrar relaciones entre marcas y modelos en productos Woocommerce
- * Version: 			1.3.0
+ * Version: 			1.4.0
  * Author: 				jmarreros
  * Author URI: 			https://decodecms.com
  * License: 			GPL-2.0+
@@ -27,6 +27,8 @@ if ( ! defined( 'WPINC' ) ) {
 
 // PLUGIN CONSTANS
 //===============
+
+define ('VERSION_PLUGIN', '1.4');
 
 define( 'ILLANTAS_DIR', plugin_dir_path( __FILE__ ) );
 define( 'ILLANTAS_URL', plugin_dir_url( __FILE__ ) );
