@@ -19,6 +19,7 @@ $modelos_meta_anclaje = json_encode($rel->get_modelos_meta_anclaje());
         margin-top:10px;
         margin-bottom:15px;
     }
+    .processing-atributos,
     .processing-existentes,
     .processing-nuevos{
         display:inline-block;
@@ -111,6 +112,26 @@ $modelos_meta_anclaje = json_encode($rel->get_modelos_meta_anclaje());
 </form>
 
 
+<?php
+// Mostramos la opción de regularizar relacion de anclajes con modelos y marcas sólo en el subsitio
+if ( is_multisite() && ! is_main_site() ): ?>
+
+<hr>
+<h3>Regulariza relación Anclaje - Modelo y Marca</h3>
+<p>La siguiente opción es para regularizar los datos de anclaje-modelo-marca del sitio principal en este sitio. Necesario si se ha agregado nuevas relaciones en el sitio principal</p>
+
+<form id="frm-regulariza-atributos" method="post">
+    <div class="submit">
+        <input name="submit" id="submit-atributos" class="button button-primary" value="Regularizar" type="submit" >
+        <span class="processing-atributos">
+            Procesando ... <img src="<?php echo ILLANTAS_URL.'/assets/loader.gif' ?>" />
+        </span>
+    </div>
+</form>
+
+
+<?php endif; ?>
+
 <script>
 
 <?php
@@ -137,7 +158,7 @@ echo "var obj_modelo_anclaje = JSON.parse('". $modelos_meta_anclaje ."');";
 //inicializaciones
 $('.processing-nuevos').hide();
 $('.processing-existentes').hide();
-
+$('.processing-atributos').hide();
 
 // --> Productos existentes
 // Change select marcas
@@ -216,6 +237,8 @@ $('.processing-existentes').on('click', '#link-refresh', function(e) {
     $('#submit-existentes').show();
 });
 
+$('#frm-regulariza-existentes #marcas').trigger('change');
+
 
 // --> On submit nuevos productos
 $('#frm-regulariza-nuevos').on('submit', function(e){
@@ -248,7 +271,39 @@ $('#frm-regulariza-nuevos').on('submit', function(e){
 
 });
 
-$('#frm-regulariza-existentes #marcas').trigger('change');
+
+
+// --> On submit regulariza atributos anclaje-modelo-marca
+$('#frm-regulariza-atributos').on('submit', function(e){
+     e.preventDefault();
+
+     $.ajax({
+        url: "<?php echo admin_url('admin-ajax.php') ?>",
+        type: 'post',
+        data:{
+            action:'illantas_regulariza_atributos'
+        },
+        beforeSend:function(){
+            $('#submit-atributos').attr('disabled',true);
+            $('.processing-atributos').show();
+        },
+        error: function(){
+            $('.processing-atributos').html('<strong>Ocurrió algún error!!</strong>');
+        },
+        success: function (res){
+            if ( parseInt(res) <= 0 ){
+                $('.processing-atributos').html('<strong>Ocurrió algún error!!</strong>');
+            }
+            else{
+                $('.processing-atributos').html('<strong>El proceso culminó correctamente</strong>');
+                $('#submit-atributos').hide();
+            }
+        }
+
+     });
+
+});
+
 
 
 })(jQuery);

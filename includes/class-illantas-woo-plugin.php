@@ -160,6 +160,7 @@ class Illantas_Woo {
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'illantas_admin_menu', 99 );
 		$this->loader->add_action( 'wp_ajax_illantas_regulariza_nuevos', $plugin_admin, 'illantas_regulariza_nuevos_ajax' );
 		$this->loader->add_action( 'wp_ajax_illantas_regulariza_existentes', $plugin_admin, 'illantas_regulariza_existentes_ajax' );
+		$this->loader->add_action( 'wp_ajax_illantas_regulariza_atributos', $plugin_admin, 'illantas_regulariza_atributos_ajax' );
 
 		// Agrega campo marca en taxonomia modelo
 		$this->loader->add_action( TAX_MODELO.'_edit_form_fields', $plugin_admin, 'add_marcas_field', 10, 2);
@@ -175,6 +176,10 @@ class Illantas_Woo {
 		// graba cambios en taxonomia modelo
 		$this->loader->add_action( 'edited_'.TAX_MODELO, $plugin_admin, 'save_anclajes_fields', 10, 2);
 		$this->loader->add_action( 'created_'.TAX_MODELO, $plugin_admin, 'save_anclajes_fields', 10, 2);
+
+
+		// Agrega los atributos del producto en los items de una orden
+		$this->loader->add_action( 'woocommerce_after_order_itemmeta', $plugin_admin, 'add_info_attributos_order', 10, 3);
 
 		// $this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_admin_styles' );
 

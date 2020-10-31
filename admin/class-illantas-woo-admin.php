@@ -116,7 +116,12 @@ class Illantas_Woo_Admin {
 		wp_die();
 	}
 
-
+	// Regulariza la relación de anclaje, modelo y marca en un subsitio
+	public function illantas_regulariza_atributos_ajax(){
+		$rel = new Illantas_Woo_Relations();
+		$rel->regularizacion_relacion_atributos();
+		wp_die();
+	}
 
 
 	//=== Agrega o edita campo marca en taxonomia modelo ===
@@ -219,7 +224,6 @@ class Illantas_Woo_Admin {
 			$nombre_transient = TRANSIENT_ANCLAJES_GRABAR . '|' . $post_id;
 			$modelos = get_transient( $nombre_transient );
 
-
 			if ( ! $modelos ) return; // validación
 
 			$modelos_anteriores =  wp_get_object_terms( $post_id, TAX_MODELO );
@@ -235,6 +239,36 @@ class Illantas_Woo_Admin {
     	}
 
 	}
+
+	// Agrega información adicional de atributos a los items de orden
+	// ========================================================
+
+	public function add_info_attributos_order($item_id, $item, $product){
+		$filter = ['diametro', 'et', 'buje', 'fabricante', 'anclaje', 'acabado', 'anchura'];
+
+		if ( $product ){
+
+			$attrs = $product->get_attributes();
+			ksort($attrs);
+
+			foreach ($attrs as $key => $value) {
+
+				if ( in_array(substr($key, 3), $filter) ){  // Buscamos a partir del tercer caracter 'pa_'
+					$terms_id = $value['data']['options'];
+
+					$term_name = [];
+					foreach ($terms_id as $term_id) {
+						$term = get_term($term_id, $key);
+						$term_name[] = $term->name;
+					}
+
+					$result = sprintf("<strong>%s:</strong>%s<br>", substr($key, 3), join(',', $term_name));
+					echo $result;
+				}
+			}
+		}
+	}
+
 
 
 

@@ -76,6 +76,9 @@
 	observer.observe(document.getElementById('fixed-sidebar-aux'));
 
 	function dcmsFixedSidebar( entries, observer ){
+
+		if (window.innerWidth < 978) return; //movil validation
+
 		if ( entries[0].isIntersecting ){
 			$('.illantas-filter-sidebar').insertBefore('.illantas-filter-products');
 		} else {
@@ -83,11 +86,4 @@
 		}
 	}
 
-
-
 })( jQuery );
-
-
-
-
-

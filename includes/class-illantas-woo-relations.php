@@ -54,6 +54,7 @@ class Illantas_Woo_Relations {
 	// Recupera todos los modelos de una marca pasándole el slug de la marca y devuelve un array asociativo de modelos
 	public function get_modelos_marca_by_slug( $slug_marca ){
 
+		// Comprobación si es un multisite
 		if ( is_multisite() ) switch_to_blog(1);
 
 		global $wpdb;
@@ -152,6 +153,9 @@ class Illantas_Woo_Relations {
 	// Grabar datos en atributos de WooCommerce también en el post_meta
 	public function save_post_meta_attributes($post_id, $modelos){
 
+		// Validación si no hay modelos no hacer nada
+		if ( empty($modelos) ) return
+
 		$meta_data_post = Array();
 
 		// Obtenemos los atributos guardados por Woocommerce
@@ -160,6 +164,7 @@ class Illantas_Woo_Relations {
 		foreach ($meta_tmp as $item) {
 			$meta_data_post[ $item['name'] ] = $item; // Guardamos los atributos en un array
 		}
+
 
 		wp_set_object_terms( $post_id, $modelos, TAX_MODELO ); // agregamos los atributos de modelo marcas
 		$meta_data_post[TAX_MODELO] = [ 'name'=> TAX_MODELO,
@@ -186,6 +191,8 @@ class Illantas_Woo_Relations {
 		// -- Fin Grabar Anclaje
 
 		update_post_meta( $post_id, '_product_attributes', $meta_data_post );
+
+		// Actualizamos flag de producto nuevo sólo cuando hay datos
 		update_post_meta( $post_id, PRODUCT_EXIST, true );
 
 		// Nos aseguramos de que tenga tipo de producto simple
@@ -257,8 +264,6 @@ class Illantas_Woo_Relations {
 
 			$this->save_post_meta_attributes( $id_product, $modelos ); //grabar en el post_meta
 
-			//Actualizamos estado de la meta para la validación
-			update_post_meta( $id_product, PRODUCT_EXIST, true );
 		}
 
 	}
@@ -312,6 +317,48 @@ class Illantas_Woo_Relations {
 		return $modelos;
 	}
 
+	// Regulariza la relación de Modelo - Anclaje y Marca en el subsitio en base a los datos del sitio principal
+	public function regularizacion_relacion_atributos(){
+
+		// Comprobación si estamos en un subsite
+		if ( is_multisite() && ! is_main_site()  ){
+
+			$rel_modelo = $this->get_relations_modelo();
+
+			$list_marcas = $this->get_marcas();
+			$list_anclajes = $this->get_anclajes();
+
+			error_log(print_r($list_anclajes,true));
+
+		}
+
+		return true;
+	}
+
+	// Función auxiliar para obtener los datos de la relación modelo - anclaje y marca del sitio principal
+	private function get_relations_modelo(){
+		global $wpdb;
+
+		//---> Cambiamos temporalmente al sitio principal
+		switch_to_blog( get_main_site_id() );
+
+		$table_taxonomy = $wpdb->prefix.'term_taxonomy';
+		$table_termmeta = $wpdb->prefix.'termmeta';
+		$table_terms 	= $wpdb->prefix.'terms';
+
+		$sql = $wpdb->prepare("SELECT t.name as modelo, tm.meta_key as relacion, tmv.name as valor FROM {$table_taxonomy} tt
+			INNER JOIN {$table_terms} t ON t.term_id = tt.term_id
+			INNER JOIN {$table_termmeta} tm ON tm.term_id = t.term_id
+			INNER JOIN {$table_terms} tmv ON tmv.term_id = tm.meta_value
+			WHERE tt.taxonomy = '%s' AND tm.meta_key in ('%s', '%s')", TAX_MODELO, TERM_META_MARCA, TERM_META_ANCLAJE);
+
+		$results = $wpdb->get_results($sql);
+
+		//---> Cambiamos nuevamente al sitio principal
+		restore_current_blog();
+
+		return $results;
+	}
 
 } // class
 
