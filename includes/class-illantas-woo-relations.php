@@ -325,10 +325,58 @@ class Illantas_Woo_Relations {
 
 			$rel_modelo = $this->get_relations_modelo();
 
+			$list_modelos = $this->get_modelos();
 			$list_marcas = $this->get_marcas();
 			$list_anclajes = $this->get_anclajes();
+			// Pasamos a array
+			$list_marcas = wp_list_pluck( $list_marcas, 'name', 'term_id' );
+			$list_anclajes = wp_list_pluck( $list_anclajes, 'name', 'term_id' );
+			$list_modelos = wp_list_pluck( $list_modelos, 'name', 'term_id' );
 
-			error_log(print_r($list_anclajes,true));
+			$name_modelo = '';
+			$id_modelo = 0;
+
+			foreach ($rel_modelo as $item) {
+
+				if ( $name_modelo !== $item->modelo){
+					$name_modelo = $item->modelo;
+					$id_modelo = array_search($name_modelo, $list_modelos); // Encontramos el id del modelo
+				}
+				$valor = $item->valor; // valor de marca o anclaje
+
+				// Sino existe el modelo lo creamos
+				if ( ! $id_modelo ) {
+					$term_insert = wp_insert_term( $name_modelo, TAX_MODELO);
+					$id_modelo = $term_insert['term_id'];
+				};
+
+				// Para el id_modelo asignamos el valor de sel-marca y sel-anclaje
+				switch ($item->relacion) {
+					case TERM_META_MARCA:
+						// Obtenemos el ID de la marca
+						$id_marca = array_search($valor, $list_marcas);
+						if ( ! $id_marca ) {
+							$term_insert = wp_insert_term( $valor, TAX_MARCA);
+							$id_marca = $term_insert['term_id'];
+							$list_marcas[$id_marca] = $valor;
+						};
+						update_term_meta($id_modelo, TERM_META_MARCA, $id_marca);
+						break;
+					case TERM_META_ANCLAJE:
+						// Obtenemos el id del anclaje
+						$id_anclaje = array_search($valor, $list_anclajes);
+						if ( ! $id_anclaje ) {
+							$term_insert = wp_insert_term( $valor, TAX_ANCLAJE);
+							$id_anclaje = $term_insert['term_id'];
+							$list_anclajes[$id_anclaje] = $valor;
+						};
+						update_term_meta($id_modelo, TERM_META_ANCLAJE, $id_anclaje);
+						break;
+					default:
+						break;
+				}
+
+			}
 
 		}
 

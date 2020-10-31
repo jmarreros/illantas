@@ -29,8 +29,6 @@ if ( $param_fabricante ){
     $args['pa_fabricante'] = $param_fabricante;
 }
 
-// error_log(print_r($args,true));
-
 // Creamos la clase pasándo como parámetro los atributos seleccionados
 $filtro_selects = new Illantas_Woo_Filters($args);
 
