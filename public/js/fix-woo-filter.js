@@ -2,7 +2,7 @@
 (function( $ ) {
     'use strict';
     let filter_marca = '';
-    const sel_modelo_options = '#woocommerce_layered_nav-6 select option';
+    const sel_modelo_options = $('.widget_layered_nav h3:contains("Modelo")').parent().find('select');
 
     // Cuando se carga la primera vez se llama a las funciones
     $( document ).ready(function() {
@@ -29,10 +29,10 @@
 
     // Función para remover elementos del select creado
     function remove_items_modelo(obj_compare){
-        const obj_modelo = $(sel_modelo_options);
+        const options_select = sel_modelo_options.find('option');
 
         // removemos los items que no se encuentren en el objeto de comparacion
-        Object.values(obj_modelo).map( (item, index) => {
+        Object.values(options_select).map( (item, index) => {
 
             if ( item.nodeName === 'OPTION' && index > 0 ){
                 const exist = obj_compare.find( option => {
@@ -52,12 +52,6 @@ function get_parameter_marca(){
 
     return urlParams.get('filter_marca');
 }
-
-
-
-// $("#woocommerce_layered_nav-7 select option[value='17-0']").remove();
-// $("#woocommerce_layered_nav-7 select option[value='20-0']").remove();
-
 
 // Cada vez que se cambian los filtros se llama nuevamente a las funcionaes
 // $( document ).ajaxStop(function() {
