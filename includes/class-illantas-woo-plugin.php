@@ -205,6 +205,8 @@ class Illantas_Woo {
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 		$this->loader->add_action( 'init', $plugin_public, 'illantas_shortcodes' );
 		$this->loader->add_action( 'woocommerce_product_get_attributes', $plugin_public, 'illantas_hide_attributes_single_product', 10, 2 );
+		$this->loader->add_action( 'wp_ajax_nopriv_fix_woo_filter', $plugin_public, 'illantas_fix_woo_filter' );
+		$this->loader->add_action( 'wp_ajax_fix_woo_filter', $plugin_public, 'illantas_fix_woo_filter' );
 
 	} // define_public_hooks()
 

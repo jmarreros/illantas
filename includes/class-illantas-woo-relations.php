@@ -54,8 +54,9 @@ class Illantas_Woo_Relations {
 	// Recupera todos los modelos de una marca pasándole el slug de la marca y devuelve un array asociativo de modelos
 	public function get_modelos_marca_by_slug( $slug_marca ){
 
+		// TODO, PENDIENTE DE REVISAR YA QUE PODRÍA TRABAJAR AHORA CON EL SUBSITE AL TENER LOS ATRIBUTOS COMPLETOS
 		// Comprobación si es un multisite
-		if ( is_multisite() ) switch_to_blog(1);
+		// if ( is_multisite() ) switch_to_blog(1);
 
 		global $wpdb;
 
@@ -73,7 +74,7 @@ class Illantas_Woo_Relations {
 
 		$result = $wpdb->get_results( $query , ARRAY_A);
 
-		if ( is_multisite() ) restore_current_blog();
+		// if ( is_multisite() ) restore_current_blog();
 
 		return $result;
 	}
@@ -147,7 +148,6 @@ class Illantas_Woo_Relations {
 
 		return $modelo_marca;
 	}
-
 
 
 	// Grabar datos en atributos de WooCommerce también en el post_meta

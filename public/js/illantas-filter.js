@@ -72,8 +72,10 @@
 		threshold: 1,
 	}
 
-	const observer = new IntersectionObserver(dcmsFixedSidebar, options)
-	observer.observe(document.getElementById('fixed-sidebar-aux'));
+	if ( $('#fixed-sidebar-aux').length ){
+		const observer = new IntersectionObserver(dcmsFixedSidebar, options)
+		observer.observe(document.getElementById('fixed-sidebar-aux'));
+	}
 
 	function dcmsFixedSidebar( entries, observer ){
 

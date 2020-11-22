@@ -20,6 +20,9 @@
  * @subpackage 		Illantas_Woo/public
  * @author 			jmarreros
  */
+
+include_once ILLANTAS_DIR.'includes/class-illantas-woo-relations.php';
+
 class Illantas_Woo_Public {
 
 	/**
@@ -92,6 +95,9 @@ class Illantas_Woo_Public {
 
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/illantas-filter.js', array( 'jquery' ), $this->version, true );
 
+		wp_enqueue_script( $this->plugin_name.'-fix', plugin_dir_url( __FILE__ ) . 'js/fix-woo-filter.js', array( 'jquery' ), $this->version, true );
+		wp_localize_script($this->plugin_name.'-fix', 'dcms_vars', ['ajaxurl'=>admin_url('admin-ajax.php')]);
+
 		// Definimos la página base para el shortcode
 		$current_page = BASE_PAGE_SHORTCODE;
 		if (is_home() || is_front_page()){
@@ -132,6 +138,24 @@ class Illantas_Woo_Public {
 		}
 
 		return $attributes;
+	}
+
+
+
+	// Función para corregir la relación de marca - model en los filtros por defecto de WooCommerce
+	public function illantas_fix_woo_filter(){
+
+		$filter_marca = $_POST['filter_marca'];
+
+		if ( $filter_marca ){
+			$relation = new Illantas_Woo_Relations();
+			$result = $relation->get_modelos_marca_by_slug($filter_marca);
+
+			error_log(print_r($result,true));
+			echo wp_json_encode($result);
+		}
+
+		wp_die();
 	}
 
 } // class
