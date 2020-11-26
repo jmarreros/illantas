@@ -271,6 +271,7 @@ class Illantas_Woo_Relations {
 
 	// Regulariza los modelos y marcas de los anclajes para nuevos productos
 	public function regularizacion_productos_existentes(){
+		global $wpdb;
 
 		$id_modelo = intval($_REQUEST['id_modelo']);
 		$id_anclaje = intval($_REQUEST['id_anclaje']);
@@ -278,28 +279,23 @@ class Illantas_Woo_Relations {
 		// validación de valores y consistencia en relación
 		if ( ! $id_modelo  || $id_anclaje != get_term_meta( $id_modelo, TERM_META_ANCLAJE, true ) ) return false;
 
-		$products = $this->get_products();
+		// Obtenemos los productos que tienen ese anclaje $id_anclaje
+		$table_relationship_taxonomy = $wpdb->prefix.'term_relationships';
+		$table_termtaxonomy = $wpdb->prefix.'term_taxonomy';
 
-		//Recorremos todos los productos obtenidos
-		foreach ( $products as $product ){
+		$sql = $wpdb->prepare("SELECT object_id as id FROM {$table_relationship_taxonomy} tr
+					INNER JOIN {$table_termtaxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
+					WHERE tt.term_id = %d", $id_anclaje);
 
-			$id_product = $product->ID;
+		$products = $wpdb->get_results($sql);
 
-			$term_anclaje_producto = get_the_terms($id_product, TAX_ANCLAJE);
+		foreach ($products as $product) {
+			$id_product = $product->id;
 
-			foreach( $term_anclaje_producto as $item ){
-
-				// Si el producto tiene un anclaje igual a id_anclaje
-				if ( $item->term_id == $id_anclaje  ) {
-					$modelos = $this->get_modelos_producto($id_product); //modelos anteriores
-					$modelos[] = $id_modelo;
-					$this->save_post_meta_attributes( $id_product, $modelos );
-					break;
-				}
-
-			}// term_anclaje_producto
-
-		}// product
+			$modelos = $this->get_modelos_producto($id_product); //modelos anteriores
+			$modelos[] = $id_modelo;
+			$this->save_post_meta_attributes( $id_product, $modelos );
+		}
 
 		return true;
 	}
@@ -425,3 +421,36 @@ class Illantas_Woo_Relations {
 
 	// 	return $anclajes;
 	// }
+
+
+
+// $results = $wpdb->get_results($sql);
+
+// return;
+// // TODO: Sólo me interesa los productos que tengan el anclaje id_anclaje ---
+// $products = $this->get_products();
+
+// error_log(print_r($products,true));
+
+// //Recorremos todos los productos obtenidos
+// foreach ( $products as $product ){
+
+// 	$id_product = $product->ID;
+
+// 	$term_anclaje_producto = get_the_terms($id_product, TAX_ANCLAJE);
+
+// 	foreach( $term_anclaje_producto as $item ){
+
+// 		// Si el producto tiene un anclaje igual a id_anclaje
+// 		if ( $item->term_id == $id_anclaje  ) {
+// 			$modelos = $this->get_modelos_producto($id_product); //modelos anteriores
+// 			$modelos[] = $id_modelo;
+// 			$this->save_post_meta_attributes( $id_product, $modelos );
+// 			break;
+// 		}
+
+// 	}// term_anclaje_producto
+
+// }// product
+
+// return true;
