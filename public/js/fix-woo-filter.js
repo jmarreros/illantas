@@ -2,7 +2,7 @@
 (function( $ ) {
     'use strict';
     let filter_marca = '';
-    const sel_modelo_options = $('.widget_layered_nav h3:contains("Modelo")').parent().find('select');
+    const sel_modelo_options = $('.widget_layered_nav h3:contains("MODELO")').parent().find('select');
 
     // Cuando se carga la primera vez se llama a las funciones
     $( document ).ready(function() {
