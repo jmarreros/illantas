@@ -273,8 +273,9 @@ class Illantas_Woo_Relations {
 	public function regularizacion_productos_existentes(){
 		global $wpdb;
 
-		$id_modelo = intval($_REQUEST['id_modelo']);
-		$id_anclaje = intval($_REQUEST['id_anclaje']);
+		$id_modelo 	= intval($_REQUEST['id_modelo']);
+		$id_marca 	= intval($_REQUEST['id_marca']);
+		$id_anclaje	= intval($_REQUEST['id_anclaje']);
 
 		// validación de valores y consistencia en relación
 		if ( ! $id_modelo  || $id_anclaje != get_term_meta( $id_modelo, TERM_META_ANCLAJE, true ) ) return false;
@@ -287,18 +288,62 @@ class Illantas_Woo_Relations {
 					INNER JOIN {$table_termtaxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
 					WHERE tt.term_id = %d", $id_anclaje);
 
-		$products = $wpdb->get_results($sql);
+		$results = $wpdb->get_results($sql);
 
-		foreach ($products as $product) {
-			$id_product = $product->id;
+		foreach ($results as $item) {
+			$product = wc_get_product( $item->id );
 
-			$modelos = $this->get_modelos_producto($id_product); //modelos anteriores
-			$modelos[] = $id_modelo;
-			$this->save_post_meta_attributes( $id_product, $modelos );
+			$this->add_term_product( $product, TAX_MODELO, $id_modelo );
+			$this->add_term_product( $product, TAX_MARCA, $id_marca );
 		}
 
-		return true;
+		return count($results);
 	}
+
+	// Función para agregar la marca y modelo al producto
+	private function add_term_product( $product, $taxonomy, $term_id){
+
+		$id_product = $product->get_id();
+		$attributes = (array) $product->get_attributes();
+
+		// Verificamos si existe la taxonomia en el producto
+		if ( array_key_exists( $taxonomy, $attributes ) ){
+
+			foreach( $attributes as $key => $attribute ){
+				if( $key == $taxonomy ){
+					$options = (array) $attribute->get_options();
+					$options[] = $term_id;
+					$attribute->set_options($options);
+					$attributes[$key] = $attribute;
+					break;
+				}
+			}
+			$product->set_attributes( $attributes );
+
+		} else { //sino existe la taxonomia
+
+			$attribute = new WC_Product_Attribute();
+
+			$attribute->set_id( sizeof( $attributes) + 1 );
+			$attribute->set_name( $taxonomy );
+			$attribute->set_options( array( $term_id ) );
+			$attribute->set_position( sizeof( $attributes) + 1 );
+			$attribute->set_visible( true );
+			$attribute->set_variation( false );
+			$attributes[] = $attribute;
+
+			$product->set_attributes( $attributes );
+
+		}
+
+		$product->save();
+
+		if( ! has_term( $term_id, $taxonomy, $id_product )){
+			wp_set_object_terms($id_product, $term_id, $taxonomy, true );
+		}
+
+	}
+
 
 	// Función que recupera los modelos actuales de un producto
 	private function get_modelos_producto($id_product){
@@ -408,6 +453,11 @@ class Illantas_Woo_Relations {
 
 
 
+	// $modelos = $this->get_modelos_producto($id_product); //modelos anteriores
+	// $modelos[] = $id_modelo;
+	// $this->save_post_meta_attributes( $id_product, $modelos );
+
+
 
 
 	// // Por cada modelo añadido agregamos su anclaje correspondiente
@@ -454,3 +504,11 @@ class Illantas_Woo_Relations {
 // }// product
 
 // return true;
+
+
+
+	// $id_product = $product->id;
+	// $modelos = $this->get_modelos_producto($id_product); //modelos anteriores
+	// $modelos[] = $id_modelo;
+	// $this->save_post_meta_attributes( $id_product, $modelos );
+

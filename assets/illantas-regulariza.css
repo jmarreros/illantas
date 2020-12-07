@@ -1,0 +1,48 @@
+.container-inline {
+  display: inline-block;
+}
+
+.processing-existentes .msg a,
+.processing-existentes .msg {
+  display: block;
+  margin-top: 4px;
+}
+
+.processing-existentes .msg span {
+  display: block;
+}
+
+#anclaje-name {
+  margin-top: 10px;
+  margin-bottom: 15px;
+}
+.processing-atributos,
+.processing-nuevos {
+  display: inline-block;
+  margin-top: -10px;
+}
+
+#frm-regulariza-existentes .container-inline {
+  vertical-align: top;
+  margin-right: 6px;
+}
+
+#anclaje-name {
+  display: inline-block;
+  vertical-align: top;
+  margin-top: 6px;
+}
+#anclaje-name span {
+  vertical-align: top;
+  min-width: 70px;
+  display: inline-block;
+  background: #ccc;
+  padding: 2px 4px;
+  min-height: 20px;
+  border-radius: 3px;
+  margin-top: -2px;
+}
+#marcas,
+#modelos {
+  min-width: 120px;
+}

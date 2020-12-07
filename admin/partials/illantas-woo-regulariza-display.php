@@ -10,56 +10,14 @@ $anclajes = $rel->get_anclajes();
 $modelos_marca = json_encode($rel->get_all_modelos_marca());
 $modelos_meta_anclaje = json_encode($rel->get_modelos_meta_anclaje());
 ?>
-
-<style>
-    .container-inline{
-        display:inline-block;
-    }
-    #anclaje-name{
-        margin-top:10px;
-        margin-bottom:15px;
-    }
-    .processing-atributos,
-    .processing-existentes,
-    .processing-nuevos{
-        display:inline-block;
-        margin-top:-10px;
-    }
-
-    #frm-regulariza-existentes .container-inline{
-        vertical-align:top;
-        margin-right:6px;
-    }
-
-    #anclaje-name{
-        display:inline-block;
-        vertical-align:top;
-        margin-top:6px;
-    }
-    #anclaje-name span{
-        vertical-align:top;
-        min-width:70px;
-        display:inline-block;
-        background:#ccc;
-        padding:2px 4px ;
-        min-height:20px;
-        border-radius:3px;
-        margin-top:-2px;
-    }
-    #marcas,
-    #modelos{
-        min-width:120px;
-    }
-</style>
-
+<!-- Regularización de productos existentes en base al anclaje -->
 <h3>Regulariza productos</h3>
-<p>Regulariza todos los productos <strong>que tengan el anclaje</strong> al que pertenece el <strong>modelo seleccionado</strong>. Se agregará el modelo y marca(si aplica)</p>
+
 <?php if ( ! empty($modelos) ): ?>
 <form id="frm-regulariza-existentes" method="post">
-    <div class="submit">
-
+    <div>
         <div class="container-inline">
-            <label>Filtrar:</label>
+            <label>Filtrar Marca:</label>
             <select id="marcas" name="marcas">
                 <?php foreach( $marcas as $marca ): ?>
                     <option value="<?= $marca->term_id; ?>"><?= $marca->name ?></option>
@@ -68,27 +26,31 @@ $modelos_meta_anclaje = json_encode($rel->get_modelos_meta_anclaje());
         </div>
 
         <div class="container-inline">
-            <label>Modelo:</label>
+            <label>Filtrar Modelo:</label>
             <select id="modelos" name="modelos">
             </select>
 
         </div>
 
-        <div class="container-inline">
-            <div id="anclaje-name">Anclaje: <span></span></div>
+        <p>Agrega marca <strong id="txt-marca"></strong> y modelo <strong id="txt-modelo"></strong> a todos los productos <strong>que tengan el siguiente anclaje</strong></p>
+
+        <div class="container-block">
+            <div class="container-inline">
+                <div id="anclaje-name">Anclaje: <span></span></div>
+            </div>
+
+            <div class="container-inline">
+                <input name="submit" id="submit-existentes" class="button button-primary" value="Regularizar" type="submit" >
+            </div>
         </div>
 
-        <div class="container-inline">
-            <input name="submit" id="submit-existentes" class="button button-primary" value="Regularizar" type="submit" >
-        </div>
-
-        <div class="container-inline">
+        <div class="container-block">
             <div class="processing-existentes">
                 <span class="procesando">
                     Procesando ... <img src="<?php echo ILLANTAS_URL.'/assets/loader.gif' ?>" />
                 </span>
-                <span class="msg">
-                </span>
+                <div class="msg">
+                </div>
             </div>
         </div>
 
@@ -98,6 +60,7 @@ $modelos_meta_anclaje = json_encode($rel->get_modelos_meta_anclaje());
     <p><strong>No hay modelos agregados</strong> 🔥</p>
 <?php endif; ?>
 
+<!-- Regularización de nuevos productos importados -->
 <hr>
 <h3>Regulariza nuevos productos</h3>
 <p>La siguiente opción te permite regularizar los <strong>modelos y marcas</strong> de los anclajes de los <strong>nuevos productos importados</strong></p>
@@ -116,6 +79,7 @@ $modelos_meta_anclaje = json_encode($rel->get_modelos_meta_anclaje());
 // Mostramos la opción de regularizar relacion de anclajes con modelos y marcas sólo en el subsitio
 if ( is_multisite() && ! is_main_site() ): ?>
 
+<!-- regularización de terminos anclaje modelo y marca en subsitios -->
 <hr>
 <h3>Regulariza relación Anclaje - Modelo y Marca</h3>
 <p>La siguiente opción es para regularizar los datos de anclaje-modelo-marca del sitio principal en este sitio. Necesario si se ha agregado nuevas relaciones en el sitio principal</p>
@@ -133,9 +97,8 @@ if ( is_multisite() && ! is_main_site() ): ?>
 <?php endif; ?>
 
 <script>
-
 <?php
-// Simplificamos objetos de modelos y anclajes
+// Simplificamos objetos de modelos y anclajes y los pasamos como variables para Javascript
 
 $arr_modelo = array();
 foreach ($modelos as $modelo){
@@ -147,165 +110,9 @@ foreach ($anclajes as $anclaje){
     $arr_anclaje[$anclaje->term_id] = $anclaje->name;
 };
 
-echo "var obj_modelos = JSON.parse('" . json_encode($arr_modelo) . "');";
-echo "var obj_anclajes = JSON.parse('" . json_encode($arr_anclaje) . "');";
-echo "var obj_marcas_modelo = JSON.parse('" . $modelos_marca . "');";
-echo "var obj_modelo_anclaje = JSON.parse('". $modelos_meta_anclaje ."');";
+echo "let obj_modelos = JSON.parse('" . json_encode($arr_modelo) . "');\n";
+echo "let obj_anclajes = JSON.parse('" . json_encode($arr_anclaje) . "');\n";
+echo "let obj_marcas_modelo = JSON.parse('" . $modelos_marca . "');\n";
+echo "let obj_modelo_anclaje = JSON.parse('". $modelos_meta_anclaje ."');\n";
 ?>
-
-(function($){
-
-//inicializaciones
-$('.processing-nuevos').hide();
-$('.processing-existentes').hide();
-$('.processing-atributos').hide();
-
-// --> Productos existentes
-// Change select marcas
-$('#frm-regulariza-existentes #marcas').on('change',function(){
-    var id_marca = $(this).val();
-    var modelos = obj_marcas_modelo[id_marca];
-
-    $('#frm-regulariza-existentes #modelos').empty();
-    if ( modelos ){
-        modelos.forEach(function(item) {
-            $('#frm-regulariza-existentes #modelos').append($('<option>', {
-                value: item,
-                text : obj_modelos[item]
-            }));
-        });
-    }
-    $('#frm-regulariza-existentes #modelos').trigger('change');
-});
-
-// Change select modelos
-$('#frm-regulariza-existentes #modelos').on('change',function(){
-    var id_modelo = $(this).val();
-    var id_anclaje = obj_modelo_anclaje[id_modelo];
-
-    $('#anclaje-name span').text(obj_anclajes[id_anclaje]?obj_anclajes[id_anclaje]:'');
-});
-
-// On submit productos existentes
-$('#frm-regulariza-existentes').on('submit', function(e){
-    e.preventDefault();
-
-    // Validate
-    if ( $('#anclaje-name span').text() == '' ){
-        alert('El modelo no tiene anclaje, asigna un anclaje antes ✋');
-        return false;
-    }
-
-    $.ajax({
-        url: "<?php echo admin_url('admin-ajax.php') ?>",
-        type: 'post',
-        data:{
-            action:'illantas_regulariza_existentes',
-            id_modelo: $('#frm-regulariza-existentes #modelos').val(),
-            id_anclaje: obj_modelo_anclaje[$('#frm-regulariza-existentes #modelos').val()]
-        },
-        beforeSend:function(){
-            $('#submit-existentes').attr('disabled', true);
-            $('.processing-existentes').show();
-            $('.processing-existentes .procesando').show();
-        },
-        error: function(){
-            $('.processing-existentes .procesando').hide();
-            $('.processing-existentes .msg').html('<strong>Ocurrió algún error!!</strong>');
-        },
-        success: function (res){
-            $('.processing-existentes .procesando').hide();
-
-            if ( parseInt(res) <= 0 ){
-                $('.processing-existentes .msg').html('<strong>Ocurrió algún error!!</strong>');
-            }
-            else{
-                $('.processing-existentes .msg').html('<strong>El proceso culminó correctamente.</strong> <a id="link-refresh" href="#">Regulariza otro modelo</a>' );
-                $('#submit-existentes').hide();
-            }
-        }
-
-     });
-
-});
-
-// Refrescar
-$('.processing-existentes').on('click', '#link-refresh', function(e) {
-    e.preventDefault();
-    $('.processing-existentes .msg').text('');
-    $('#submit-existentes').attr('disabled', false);
-    $('#submit-existentes').show();
-});
-
-$('#frm-regulariza-existentes #marcas').trigger('change');
-
-
-// --> On submit nuevos productos
-$('#frm-regulariza-nuevos').on('submit', function(e){
-     e.preventDefault();
-
-     $.ajax({
-        url: "<?php echo admin_url('admin-ajax.php') ?>",
-        type: 'post',
-        data:{
-            action:'illantas_regulariza_nuevos'
-        },
-        beforeSend:function(){
-            $('#submit-nuevos').attr('disabled',true);
-            $('.processing-nuevos').show();
-        },
-        error: function(){
-            $('.processing-nuevos').html('<strong>Ocurrió algún error!!</strong>');
-        },
-        success: function (res){
-            if ( parseInt(res) <= 0 ){
-                $('.processing-nuevos').html('<strong>Ocurrió algún error!!</strong>');
-            }
-            else{
-                $('.processing-nuevos').html('<strong>El proceso culminó correctamente</strong>');
-                $('#submit-nuevos').hide();
-            }
-        }
-
-     });
-
-});
-
-
-
-// --> On submit regulariza atributos anclaje-modelo-marca
-$('#frm-regulariza-atributos').on('submit', function(e){
-     e.preventDefault();
-
-     $.ajax({
-        url: "<?php echo admin_url('admin-ajax.php') ?>",
-        type: 'post',
-        data:{
-            action:'illantas_regulariza_atributos'
-        },
-        beforeSend:function(){
-            $('#submit-atributos').attr('disabled',true);
-            $('.processing-atributos').show();
-        },
-        error: function(){
-            $('.processing-atributos').html('<strong>Ocurrió algún error!!</strong>');
-        },
-        success: function (res){
-            if ( parseInt(res) <= 0 ){
-                $('.processing-atributos').html('<strong>Ocurrió algún error!!</strong>');
-            }
-            else{
-                $('.processing-atributos').html('<strong>El proceso culminó correctamente</strong>');
-                $('#submit-atributos').hide();
-            }
-        }
-
-     });
-
-});
-
-
-
-})(jQuery);
-
 </script>

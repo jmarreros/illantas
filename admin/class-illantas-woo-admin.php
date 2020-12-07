@@ -60,14 +60,17 @@ class Illantas_Woo_Admin {
 
 
 	// Agrega archivo de estilos
-
 	public function enqueue_admin_styles(){
-		wp_enqueue_style('admin-styles', plugin_dir_url(__FILE__).'../assets/illantas.css');
+		wp_register_style('illantas-styles', plugin_dir_url(__FILE__).'../assets/illantas-regulariza.css', array(), $this->version);
+	}
+
+	// Agrega archivo javascript
+	public function enqueue_admin_scripts(){
+		wp_register_script('illantas-script', plugin_dir_url(__FILE__).'../assets/illantas-regulariza.js', array( 'jquery' ), $this->version, true);
 	}
 
 	//=== Agrega o edita campo marca en taxonomia modelo ===
 	// =======================================================
-
 
 	// Menú bajo Woocommerce
 	// -----------------------
@@ -91,6 +94,10 @@ class Illantas_Woo_Admin {
 
 	//-- Muestra la opción de menú de regularización marca modelo
 	public function illantas_admin_regulariza_modelos(){
+			wp_enqueue_style('illantas-styles');
+			wp_enqueue_script('illantas-script');
+			wp_localize_script('illantas-script','dcms_vars',['ajaxurl'=>admin_url('admin-ajax.php')]);
+
 			$rel = new Illantas_Woo_Relations();
 			include_once ILLANTAS_DIR . 'admin/partials/illantas-woo-regulariza-display.php';
 	}
@@ -112,7 +119,7 @@ class Illantas_Woo_Admin {
 	// Regulariza las modelos y marcas para productos existentes
 	public function illantas_regulariza_existentes_ajax(){
 		$rel = new Illantas_Woo_Relations();
-		$rel->regularizacion_productos_existentes();
+		echo $rel->regularizacion_productos_existentes();
 		wp_die();
 	}
 

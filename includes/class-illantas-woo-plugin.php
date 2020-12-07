@@ -181,7 +181,8 @@ class Illantas_Woo {
 		// Agrega los atributos del producto en los items de una orden
 		$this->loader->add_action( 'woocommerce_after_order_itemmeta', $plugin_admin, 'add_info_attributos_order', 10, 3);
 
-		// $this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_admin_styles' );
+		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_admin_styles' );
+		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_admin_scripts' );
 
 		// //Importer CSV hooks
 		// $this->loader->add_filter( 'woocommerce_product_import_before_process_item', $plugin_admin, 'illantas_csv_before_import', 10, 1);
